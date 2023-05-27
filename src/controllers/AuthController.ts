@@ -10,14 +10,14 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
   try {
     // Find user with email
     const user: User | null = await User.findOne({ where: { email } });
-    if (!user) return res.status(400).send('No user found with specified email.');
+    if (!user) return res.status(400).send('Invalid credentials.');
 
     // Verify password
     const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) return res.status(400).send('Password incorrect.')
+    if (!isPasswordValid) return res.status(400).send('Invalid credentials.')
 
     // Create token
-    if (!secret) return res.status(500).send('Secret needs to be specified.');
+    if (!secret) return res.status(500).send('Internal server error.');
     const token = jwt.sign({ id: user.id }, secret, { expiresIn: '1d' });
 
     // Send response
