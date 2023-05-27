@@ -10,7 +10,7 @@ const databasePort = process.env.DB_PORT;
 const databaseUsername = process.env.DB_USERNAME || 'root';
 const databasePassword = process.env.DB_PASSWORD;
 
-const secret = process.env.TOKEN_SECRET;
+const secret = process.env.SECRET;
 
 export {
   appPort,

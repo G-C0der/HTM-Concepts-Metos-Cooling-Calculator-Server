@@ -3,9 +3,9 @@ import {User} from "../models/User";
 import bcrypt from "bcrypt";
 
 const register = async (req: Request, res: Response, next: NextFunction) => {
-  const { email, password } = req.body;
-
   try {
+    const { email, password } = req.body;
+
     // Check if user exists
     const user = await User.findOne({ where: { email } });
     if (user) return res.status(400).send('A user with the specified email already exists.');
@@ -14,7 +14,7 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
     const hash = await bcrypt.hash(password, 10);
 
     // Create user
-    const { password: pw, ...newUser } = await User.create({
+    const { dataValues: { password: pw, ...newUser } } = await User.create({
       email,
       password: hash
     });

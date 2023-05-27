@@ -5,9 +5,9 @@ import jwt from 'jsonwebtoken';
 import {secret} from "../config";
 
 const login = async (req: Request, res: Response, next: NextFunction) => {
-  const { email, password } = req.body;
-
   try {
+    const { email, password } = req.body;
+
     // Find user with email
     const user: User | null = await User.findOne({ where: { email } });
     if (!user) return res.status(400).send('Invalid credentials.');
