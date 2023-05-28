@@ -12,6 +12,8 @@ const databasePassword = process.env.DB_PASSWORD;
 
 const secret = process.env.SECRET;
 
+const jawsDBMariaURL = process.env.JAWSDB_MARIA_URL;
+
 export {
   appPort,
 
@@ -21,5 +23,7 @@ export {
   databaseUsername,
   databasePassword,
 
-  secret
+  secret,
+
+  jawsDBMariaURL
 };
