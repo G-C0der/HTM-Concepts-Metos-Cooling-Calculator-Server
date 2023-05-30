@@ -3,6 +3,7 @@ import {User} from "../models/User";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import {secret} from "../config";
+import moment from "moment";
 
 const login = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -19,9 +20,13 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
     // Create token
     if (!secret) return res.status(500).send('Internal server error.');
     const token = jwt.sign({ id: user.id }, secret, { expiresIn: '1d' });
+    const expiration = moment().add(1, 'day').valueOf();
 
     // Send response
-    res.status(200).json({ token });
+    res.status(200).json({
+      token,
+      expiration
+    });
   } catch (err) {
     res.status(500).send('Internal server error.');
     next(err);
