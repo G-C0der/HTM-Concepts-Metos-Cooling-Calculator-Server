@@ -14,7 +14,8 @@
     "jsonwebtoken": "^9.0.0",
     "moment": "^2.29.4",
     "mysql2": "^3.3.2",
-    "sequelize": "^6.31.1"
+    "sequelize": "^6.31.1",
+    "yup": "^1.2.0"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
