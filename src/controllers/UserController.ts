@@ -19,7 +19,7 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
       password: hash
     });
 
-    // Send user back without password
+    // Send response
     res.status(200).json(true);
   } catch (err) {
     res.status(500).send('Internal server error.');
