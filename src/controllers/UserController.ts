@@ -6,7 +6,7 @@ import {escapeForRegExp} from "../utils";
 
 const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, tnc, ...otherFields } = req.body;
 
     // Validate email and password
     const passwordSpecialCharacters = '*.!@#$%^&(){}[\]:;<>,.?\/~_+\-=|\\';
@@ -46,7 +46,8 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
     // Create user
     const { dataValues: { password: pw, ...newUser } } = await User.create({
       email,
-      password: hash
+      password: hash,
+      ...otherFields
     });
 
     // Send response
