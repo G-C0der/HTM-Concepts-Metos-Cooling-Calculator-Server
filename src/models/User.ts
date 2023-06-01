@@ -41,14 +41,17 @@ User.init({
   },
   verified: {
     type: new DataTypes.BOOLEAN(),
+    allowNull: false,
     defaultValue: false
   },
   active: {
     type: new DataTypes.BOOLEAN(),
+    allowNull: false,
     defaultValue: false
   },
   admin: {
     type: new DataTypes.BOOLEAN(),
+    allowNull: false,
     defaultValue: false
   },
   title: {
