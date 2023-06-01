@@ -3,6 +3,7 @@ import {User} from "../models/User";
 import bcrypt from "bcrypt";
 import * as yup from 'yup';
 import {escapeForRegExp} from "../utils";
+import mailer from "../services/Mailer";
 
 const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -52,6 +53,9 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
       password: hash,
       ...otherFields
     });
+
+    // Send verification email
+    const mailerResponse = await mailer.sendVerificationEmail(email);
 
     // Send response
     res.status(200).json(true);
