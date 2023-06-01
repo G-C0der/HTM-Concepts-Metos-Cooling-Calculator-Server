@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import {User} from "../models/User";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import {secret} from "../config";
+import {authSecret} from "../config";
 import moment from "moment";
 
 const login = async (req: Request, res: Response, next: NextFunction) => {
@@ -18,8 +18,8 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
     if (!isPasswordValid) return res.status(400).send('Invalid credentials.')
 
     // Create token
-    if (!secret) return res.status(500).send('Internal server error.');
-    const token = jwt.sign({ id: user.id }, secret, { expiresIn: '1d' });
+    if (!authSecret) return res.status(500).send('Internal server error.');
+    const token = jwt.sign({ id: user.id }, authSecret, { expiresIn: '1d' });
     const expiration = moment().add(1, 'day').valueOf();
 
     // Send response

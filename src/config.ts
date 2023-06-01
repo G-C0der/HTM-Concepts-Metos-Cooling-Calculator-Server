@@ -10,7 +10,8 @@ const databasePort = process.env.DB_PORT;
 const databaseUsername = process.env.DB_USERNAME || 'root';
 const databasePassword = process.env.DB_PASSWORD;
 
-const secret = process.env.SECRET;
+const authSecret = process.env.AUTH_SECRET;
+const verificationSecret = process.env.VERIFICATION_SECRET;
 
 const smtpExchangeHost = process.env.SMTP_EXCHANGE_HOST;
 const smtpExchangePort = process.env.SMTP_EXCHANGE_PORT;
@@ -28,7 +29,8 @@ export {
   databaseUsername,
   databasePassword,
 
-  secret,
+  authSecret,
+  verificationSecret,
 
   smtpExchangeHost,
   smtpExchangePort,
