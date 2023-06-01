@@ -33,7 +33,10 @@ User.init({
   email: {
     type: new DataTypes.STRING(128),
     allowNull: false,
-    unique: true
+    unique: true,
+    set (value: string) {
+      this.setDataValue('email', value.trim())
+    }
   },
   password: {
     type: new DataTypes.STRING(128),
@@ -55,34 +58,64 @@ User.init({
     defaultValue: false
   },
   title: {
-    type: new DataTypes.STRING(64)
+    type: new DataTypes.STRING(64),
+    set (value: string) {
+      this.setDataValue('title', value.trim())
+    }
   },
   fname: {
-    type: new DataTypes.STRING(64)
+    type: new DataTypes.STRING(64),
+    set (value: string) {
+      this.setDataValue('fname', value.trim())
+    }
   },
   lname: {
-    type: new DataTypes.STRING(64)
+    type: new DataTypes.STRING(64),
+    set (value: string) {
+      this.setDataValue('lname', value.trim())
+    }
   },
   phone: {
-    type: new DataTypes.STRING(32)
+    type: new DataTypes.STRING(32),
+    set (value: string) {
+      this.setDataValue('phone', value.trim())
+    }
   },
   country: {
-    type: new DataTypes.STRING(64)
+    type: new DataTypes.STRING(64),
+    set (value: string) {
+      this.setDataValue('country', value.trim())
+    }
   },
   city: {
-    type: new DataTypes.STRING(64)
+    type: new DataTypes.STRING(64),
+    set (value: string) {
+      this.setDataValue('city', value.trim())
+    }
   },
   zip: {
-    type: new DataTypes.STRING(16)
+    type: new DataTypes.STRING(16),
+    set (value: string) {
+      this.setDataValue('zip', value.trim())
+    }
   },
   street: {
-    type: new DataTypes.STRING(128)
+    type: new DataTypes.STRING(128),
+    set (value: string) {
+      this.setDataValue('street', value.trim())
+    }
   },
   company: {
-    type: new DataTypes.STRING(256)
+    type: new DataTypes.STRING(256),
+    set (value: string) {
+      this.setDataValue('company', value.trim())
+    }
   },
   website: {
-    type: new DataTypes.STRING(512)
+    type: new DataTypes.STRING(512),
+    set (value: string) {
+      this.setDataValue('website', value.trim())
+    }
   }
 },
 {
