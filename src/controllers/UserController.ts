@@ -55,10 +55,12 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
     });
 
     // Send verification email
-    const mailerResponse = await mailer.sendVerificationEmail(email);
+    const { accepted, messageId } = await mailer.sendVerificationEmail(email);
 
     // Send response
-    res.status(200).json(true);
+    res.status(200).json({
+      wasVerificationEmailSent: ((accepted && accepted[0] === email) && messageId)
+    });
   } catch (err) {
     res.status(500).send('Internal server error.');
     next(err);

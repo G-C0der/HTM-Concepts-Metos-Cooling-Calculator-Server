@@ -1,5 +1,7 @@
 import nodemailer from 'nodemailer';
 import { smtpExchangeHost, smtpExchangePort, smtpExchangeEmail, smtpExchangePassword } from '../config';
+import ejs from 'ejs';
+import path from 'path';
 
 type Attachments = {
   filename: string;
@@ -17,27 +19,49 @@ class Mailer {
     }
   });
 
-  private sendEmail = async (recipientEmail: string, subject: string, html: string, attachments?: Attachments) => {
-    const mail = {
-      sender: smtpExchangeEmail,
-      from: smtpExchangeEmail,
-      to: recipientEmail,
-      subject,
-      html,
-      ...(attachments && { attachments })
-    };
+  private renderEmail = async (templatePath: string, data: any): Promise<string> => {
+    try {
+      const email: string = await ejs.renderFile(templatePath, data);
+      return email;
+    } catch (err) {
+      console.error(`Error rendering email template. Error: ${err}`);
+      throw err;
+    }
+  };
 
-    const { accepted, messageId } = await this.transport.sendMail(mail);
-    return { accepted, messageId };
+  private sendEmail = async (
+    recipientEmail: string,
+    subject: string,
+    emailTemplatePath: string,
+    emailData: object,
+    attachments?: Attachments
+  ) => {
+    try {
+      const emailContent = await this.renderEmail(emailTemplatePath, emailData);
+      const email = {
+        sender: smtpExchangeEmail,
+        from: smtpExchangeEmail,
+        to: recipientEmail,
+        subject,
+        html: emailContent,
+        ...(attachments && { attachments })
+      };
+
+      const { accepted, messageId } = await this.transport.sendMail(email);
+      return { accepted, messageId };
+    } catch (err) {
+      console.error(`Error sending email. Error: ${err}`);
+      return {};
+    }
   };
 
   sendVerificationEmail = async (recipientEmail: string) => {
+    const templatePath = path.join(__dirname, '../templates/verificationEmail.ejs');
     return await this.sendEmail(
       recipientEmail,
-      'Cooling Calculator - Verification of your email',
-      `Your Cooling Calculator user account has been successfully registered!<br/><br/>
-        Click on the following link to validate your account: <br/><br/><br/>
-        If you have any question feel free to contact us!`
+      'Verify Your Cooling Calculator User Account',
+      templatePath,
+      { verificationLink: 'www.google.com' }
     );
   };
 }
