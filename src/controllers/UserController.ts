@@ -55,7 +55,7 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
     });
 
     // Send verification email
-    const { accepted, messageId } = await mailer.sendVerificationEmail(email);
+    const { accepted, messageId } = await mailer.sendVerificationPendingEmail(email);
 
     // Send response
     res.status(200).json({

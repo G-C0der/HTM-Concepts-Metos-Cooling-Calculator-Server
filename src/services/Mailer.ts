@@ -2,6 +2,7 @@ import nodemailer from 'nodemailer';
 import { smtpExchangeHost, smtpExchangePort, smtpExchangeEmail, smtpExchangePassword } from '../config';
 import ejs from 'ejs';
 import path from 'path';
+import { escape } from 'lodash';
 
 type Attachments = {
   filename: string;
@@ -9,7 +10,7 @@ type Attachments = {
 }[];
 
 class Mailer {
-  transport = nodemailer.createTransport({
+  private transport = nodemailer.createTransport({
     // @ts-ignore
     host: smtpExchangeHost,
     port: smtpExchangePort,
@@ -19,7 +20,7 @@ class Mailer {
     }
   });
 
-  private renderEmail = async (templatePath: string, data: any): Promise<string> => {
+  private renderEmail = async (templatePath: string, data: object = {}): Promise<string> => {
     try {
       const email: string = await ejs.renderFile(templatePath, data);
       return email;
@@ -33,7 +34,7 @@ class Mailer {
     recipientEmail: string,
     subject: string,
     emailTemplatePath: string,
-    emailData: object,
+    emailData?: object,
     attachments?: Attachments
   ) => {
     try {
@@ -55,13 +56,41 @@ class Mailer {
     }
   };
 
-  sendVerificationEmail = async (recipientEmail: string) => {
-    const templatePath = path.join(__dirname, '../templates/verificationEmail.ejs');
+  sendVerificationPendingEmail = async (userEmail: string) => {
+    const templatePath = path.join(__dirname, '../templates/verificationPendingEmail.ejs');
     return await this.sendEmail(
-      recipientEmail,
-      'Verify Your Cooling Calculator User Account',
+      userEmail,
+      'Cooling Calculator - Verify Your User Account',
       templatePath,
       { verificationLink: 'www.google.com' }
+    );
+  };
+
+  sendVerificationDoneEmail = async (htmConceptsEmail: string, userEmail: string) => {
+    const templatePath = path.join(__dirname, '../templates/verificationDoneEmail.ejs');
+    return await this.sendEmail(
+      htmConceptsEmail,
+      'Cooling Calculator - A User Account Is Ready for Activation',
+      templatePath,
+      { userEmail: escape(userEmail) }
+    );
+  };
+  
+  sendActivationPendingEmail =  async (userEmail: string) => {
+    const templatePath = path.join(__dirname, '../templates/activationPendingEmail.ejs');
+    return await this.sendEmail(
+      userEmail,
+      'Cooling Calculator - Your User Account Is Awaiting Activation',
+      templatePath
+    );
+  };
+
+  sendActivationDoneEmail = async (userEmail: string) => {
+    const templatePath = path.join(__dirname, '../templates/activationDoneEmail.ejs');
+    return await this.sendEmail(
+      userEmail,
+      'Cooling Calculator - Your Account is Now Active',
+      templatePath
     );
   };
 }
