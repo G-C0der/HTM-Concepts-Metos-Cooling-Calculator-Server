@@ -12,6 +12,11 @@ const databasePassword = process.env.DB_PASSWORD;
 
 const secret = process.env.SECRET;
 
+const smtpExchangeHost = process.env.SMTP_EXCHANGE_HOST;
+const smtpExchangePort = process.env.SMTP_EXCHANGE_PORT;
+const smtpExchangeEmail = process.env.SMTP_EXCHANGE_EMAIL;
+const smtpExchangePassword = process.env.SMTP_EXCHANGE_PASSWORD;
+
 const jawsDBMariaURL = process.env.JAWSDB_MARIA_URL;
 
 export {
@@ -24,6 +29,11 @@ export {
   databasePassword,
 
   secret,
+
+  smtpExchangeHost,
+  smtpExchangePort,
+  smtpExchangeEmail,
+  smtpExchangePassword,
 
   jawsDBMariaURL
 };
