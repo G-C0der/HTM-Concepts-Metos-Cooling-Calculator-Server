@@ -8,6 +8,9 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email, password, tnc, ...otherFields } = req.body;
 
+    // Check if Terms and Conditions accepted
+    if (!tnc) return res.status(400).send('You must accept the Terms and Conditions.');
+
     // Validate email and password
     const passwordSpecialCharacters = '*.!@#$%^&(){}[\]:;<>,.?\/~_+\-=|\\';
     const passwordSpecialCharactersDoubleEscaped = escapeForRegExp(passwordSpecialCharacters);
