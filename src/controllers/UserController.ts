@@ -5,6 +5,8 @@ import * as yup from 'yup';
 import {escapeForRegExp} from "../utils";
 import mailer from "../services/Mailer";
 
+const serverError = 'Internal server error.';
+
 const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email, password, tnc, ...otherFields } = req.body;
@@ -62,11 +64,29 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
       wasVerificationEmailSent: ((accepted && accepted[0] === email) && messageId)
     });
   } catch (err) {
-    res.status(500).send('Internal server error.');
+    res.status(500).send(serverError);
+    next(err);
+  }
+};
+
+const sendVerificationEmail = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { email } = req.body;
+
+    // Send verification email
+    const { accepted, messageId } = await mailer.sendVerificationPendingEmail(email);
+
+    // Send response
+    res.status(200).json({
+      wasVerificationEmailSent: ((accepted && accepted[0] === email) && messageId)
+    });
+  } catch (err) {
+    res.status(500).send(serverError);
     next(err);
   }
 };
 
 export {
-  register
+  register,
+  sendVerificationEmail
 };
