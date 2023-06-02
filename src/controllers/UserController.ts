@@ -133,12 +133,20 @@ const verify = async (req: Request, res: Response, next: NextFunction) => {
       }
     }
 
+    // Check if user exists and if already verified
+    const user = await User.findOne({
+      where: { id },
+      attributes: ['verified']
+    });
+    if (!user) return res.status(400).send('User verification failed.');
+    if (user!.verified) return res.status(400).send('User Account has already been verified.');
+
     // Set user verified
-    const verified = await User.update(
+    const updated = await User.update(
       { verified: true },
       { where: { id } }
     );
-    if (!verified) return res.status(400).send('User verification failed.');
+    if (!updated) return res.status(400).send('User verification failed.');
 
     // Send response
     res.status(200);
