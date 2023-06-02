@@ -138,11 +138,10 @@ const verify = async (req: Request, res: Response, next: NextFunction) => {
       { verified: true },
       { where: { id } }
     );
+    if (!verified) return res.status(400).send('User verification failed.');
 
     // Send response
-    res.status(200).json({
-      verified: !!verified
-    });
+    res.status(200);
   } catch (err) {
     console.error(`${serverError} Error: ${err}`);
     res.status(500).send(serverError);
