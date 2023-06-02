@@ -6,6 +6,8 @@ import {escapeForRegExp} from "../utils";
 import {mailer} from "../services";
 import validator from 'validator';
 import { UserService } from "../services";
+import jwt from "jsonwebtoken";
+import {verificationSecret} from "../config";
 
 const serverError = 'Internal server error.';
 
@@ -114,7 +116,42 @@ const sendVerificationEmail = async (req: Request, res: Response, next: NextFunc
   }
 };
 
+const verify = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { token } = req.params;
+
+    // Validate token
+    if (!verificationSecret) throw new Error('Error verifying user. Secret not provided.');
+    let id;
+    try {
+      ({ id } = jwt.verify(token, verificationSecret) as jwt.JwtPayload);
+    } catch (err) {
+      if (err instanceof jwt.JsonWebTokenError) {
+        return res.status(400).send('User verification failed.');
+      } else if (err instanceof jwt.TokenExpiredError) {
+        return res.status(400).send('Your verification link has expired.');
+      }
+    }
+
+    // Set user verified
+    const verified = await User.update(
+      { verified: true },
+      { where: { id } }
+    );
+
+    // Send response
+    res.status(200).json({
+      verified: !!verified
+    });
+  } catch (err) {
+    console.error(`${serverError} Error: ${err}`);
+    res.status(500).send(serverError);
+    next(err);
+  }
+};
+
 export {
   register,
-  sendVerificationEmail
+  sendVerificationEmail,
+  verify
 };

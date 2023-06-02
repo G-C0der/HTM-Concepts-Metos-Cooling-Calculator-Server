@@ -28,7 +28,7 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
     if (!user.active) return res.status(400).send('Your user account is currently inactive.');
 
     // Create token
-    if (!authSecret) return res.status(500).send('Internal server error.');
+    if (!authSecret) throw new Error('Error logging in user. Secret not provided.');
     const token = jwt.sign({ id: user.id }, authSecret, { expiresIn: '1d' });
     const expiration = moment().add(1, 'day').valueOf();
 

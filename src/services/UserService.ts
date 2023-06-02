@@ -6,8 +6,7 @@ class UserService {
   constructor(private user: User) {}
 
   generateVerificationUrl = () => {
-    if (!verificationSecret) throw new Error('Error generating verification URL. Error: verification secret ' +
-      'not provided');
+    if (!verificationSecret) throw new Error('Error generating verification URL. Secret not provided.');
     const token = jwt.sign({ id: this.user.id }, verificationSecret, { expiresIn: '1d' });
     return new URL(`/verification/${token}`, clientBaseUrl).toString();
   };
