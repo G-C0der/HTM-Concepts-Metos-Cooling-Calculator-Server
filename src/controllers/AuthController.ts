@@ -19,7 +19,11 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
 
     // Verify password
     const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) return res.status(400).send('Credentials are invalid.')
+    if (!isPasswordValid) return res.status(400).send('Credentials are invalid.');
+
+    // Verify user
+    if (!user.verified) return res.status(400).send('Your user account hasn\'t been verified yet.');
+    if (!user.active) return res.status(400).send('Your user account hasn\'t been activated yet.');
 
     // Create token
     if (!authSecret) return res.status(500).send('Internal server error.');
