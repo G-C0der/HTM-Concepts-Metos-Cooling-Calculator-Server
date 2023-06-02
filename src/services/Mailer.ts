@@ -56,13 +56,13 @@ class Mailer {
     }
   };
 
-  sendVerificationPendingEmail = async (userEmail: string) => {
+  sendVerificationPendingEmail = async (userEmail: string, verificationUrl: string) => {
     const templatePath = path.join(__dirname, '../templates/verificationPendingEmail.ejs');
     return await this.sendEmail(
       userEmail,
       'Cooling Calculator - Verify Your User Account',
       templatePath,
-      { verificationLink: 'www.google.com' }
+      { verificationUrl }
     );
   };
 

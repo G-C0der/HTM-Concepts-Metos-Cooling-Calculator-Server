@@ -18,6 +18,8 @@ const smtpExchangePort = process.env.SMTP_EXCHANGE_PORT;
 const smtpExchangeEmail = process.env.SMTP_EXCHANGE_EMAIL;
 const smtpExchangePassword = process.env.SMTP_EXCHANGE_PASSWORD;
 
+const clientBaseUrl = process.env.CLIENT_BASE_URL || 'http://localhost:3000';
+
 const jawsDBMariaURL = process.env.JAWSDB_MARIA_URL;
 
 export {
@@ -36,6 +38,8 @@ export {
   smtpExchangePort,
   smtpExchangeEmail,
   smtpExchangePassword,
+
+  clientBaseUrl,
 
   jawsDBMariaURL
 };

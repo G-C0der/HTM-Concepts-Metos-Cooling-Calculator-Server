@@ -3,8 +3,9 @@ import {User} from "../models/User";
 import bcrypt from "bcrypt";
 import * as yup from 'yup';
 import {escapeForRegExp} from "../utils";
-import mailer from "../services/Mailer";
+import {mailer} from "../services";
 import validator from 'validator';
+import { UserService } from "../services";
 
 const serverError = 'Internal server error.';
 
@@ -60,8 +61,12 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
       ...otherFields
     });
 
+    // Create verification URL
+    const userService = new UserService(newUser);
+    const verificationUrl = userService.generateVerificationUrl();
+
     // Send verification email
-    const { accepted, messageId } = await mailer.sendVerificationPendingEmail(email);
+    const { accepted, messageId } = await mailer.sendVerificationPendingEmail(email, verificationUrl);
 
     // Send response
     res.status(200).json({
@@ -81,11 +86,18 @@ const sendVerificationEmail = async (req: Request, res: Response, next: NextFunc
     if (!validator.isEmail(email)) return res.status(400).send('Email is invalid.');
 
     // Check if user exists
-    const user = await User.findOne({ where: { email } });
+    const user = await User.findOne({
+      where: { email },
+      attributes: { exclude: ['password'] }
+    });
     if (!user) return res.status(400).send('A user with the specified email doesn\'t exists.');
 
+    // Create verification URL
+    const userService = new UserService(user);
+    const verificationUrl = userService.generateVerificationUrl();
+
     // Send verification email
-    const { accepted, messageId } = await mailer.sendVerificationPendingEmail(email);
+    const { accepted, messageId } = await mailer.sendVerificationPendingEmail(email, verificationUrl);
 
     // Send response
     res.status(200).json({
