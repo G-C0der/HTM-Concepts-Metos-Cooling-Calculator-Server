@@ -16,7 +16,10 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
     if (!validator.isEmail(email)) return res.status(400).send('Email is invalid.');
 
     // Find user with email
-    const user: User | null = await User.findOne({ where: { email } });
+    const user: User | null = await User.findOne({
+      where: { email },
+      attributes: ['password', 'verified', 'active', 'admin']
+    });
     if (!user) return res.status(400).send('Credentials are invalid.');
 
     // Verify password

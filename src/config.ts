@@ -20,6 +20,8 @@ const smtpExchangePassword = process.env.SMTP_EXCHANGE_PASSWORD;
 
 const clientBaseUrl = process.env.CLIENT_BASE_URL || 'http://localhost:3000';
 
+const htmConceptsEmail = process.env.HTM_CONCEPTS_EMAIL || 'info@htm-concepts.ch';
+
 const jawsDBMariaURL = process.env.JAWSDB_MARIA_URL;
 
 export {
@@ -40,6 +42,7 @@ export {
   smtpExchangePassword,
 
   clientBaseUrl,
+  htmConceptsEmail,
 
   jawsDBMariaURL
 };

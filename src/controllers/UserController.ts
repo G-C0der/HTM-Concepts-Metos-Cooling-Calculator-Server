@@ -7,7 +7,7 @@ import {mailer} from "../services";
 import validator from 'validator';
 import { UserService } from "../services";
 import jwt from "jsonwebtoken";
-import {verificationSecret} from "../config";
+import {htmConceptsEmail, verificationSecret} from "../config";
 
 const serverError = 'Internal server error.';
 
@@ -52,7 +52,7 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
     // Check if user exists
     const user = await User.findOne({
       where: { email },
-      attributes: { exclude: ['password'] }
+      attributes: ['id']
     });
     if (user) return res.status(400).send('A user with the specified email already exists.');
 
@@ -94,7 +94,7 @@ const sendVerificationEmail = async (req: Request, res: Response, next: NextFunc
     // Check if user exists
     const user = await User.findOne({
       where: { email },
-      attributes: { exclude: ['password'] }
+      attributes: ['id']
     });
     if (!user) return res.status(400).send('A user with the specified email doesn\'t exists.');
 
@@ -102,7 +102,7 @@ const sendVerificationEmail = async (req: Request, res: Response, next: NextFunc
     const userService = new UserService(user);
     const verificationUrl = userService.generateVerificationUrl();
 
-    // Send verification email
+    // Send verification pending email
     const { accepted, messageId } = await mailer.sendVerificationPendingEmail(email, verificationUrl);
 
     // Send response
@@ -136,7 +136,7 @@ const verify = async (req: Request, res: Response, next: NextFunction) => {
     // Check if user exists and if already verified
     const user = await User.findOne({
       where: { id },
-      attributes: ['verified']
+      attributes: ['email', 'verified']
     });
     if (!user) return res.status(400).send('No user associated with this verification link.');
     if (user!.verified) return res.status(400).send('User Account has already been verified.');
@@ -147,6 +147,12 @@ const verify = async (req: Request, res: Response, next: NextFunction) => {
       { where: { id } }
     );
     if (!updated) return res.status(400).send('Unexpected error during verification. Please try again later');
+
+    // Send verification done email
+    mailer.sendVerificationDoneEmail(htmConceptsEmail, user.email);
+
+    // Send activation pending email
+    mailer.sendActivationPendingEmail(user.email);
 
     // Send response
     res.status(200).send('User verification succeeded.');
