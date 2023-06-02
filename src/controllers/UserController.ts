@@ -48,7 +48,10 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
     }
 
     // Check if user exists
-    const user = await User.findOne({ where: { email } });
+    const user = await User.findOne({
+      where: { email },
+      attributes: { exclude: ['password'] }
+    });
     if (user) return res.status(400).send('A user with the specified email already exists.');
 
     // Hash password
