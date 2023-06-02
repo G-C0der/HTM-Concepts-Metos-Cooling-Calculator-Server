@@ -4,15 +4,21 @@ import bcrypt from "bcrypt";
 import * as yup from 'yup';
 import {escapeForRegExp} from "../utils";
 import mailer from "../services/Mailer";
+import validator from 'validator';
 
 const serverError = 'Internal server error.';
 
 const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { email, password, tnc, ...otherFields } = req.body;
+    let { email } = req.body;
+    const { password, tnc, ...otherFields } = req.body;
 
     // Check if Terms and Conditions accepted
     if (!tnc) return res.status(400).send('You must accept the Terms and Conditions.');
+
+    // Validate email
+    if (!validator.isEmail(email)) return res.status(400).send('Email is invalid.');
+    email = validator.normalizeEmail(email);
 
     // Validate email and password
     const passwordSpecialCharacters = '*.!@#$%^&(){}[\]:;<>,.?\/~_+\-=|\\';
@@ -21,16 +27,16 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
     const validationSchema = yup.object({
       email: yup
         .string()
-        .required('Email is required')
-        .email('Email is invalid'),
+        .required('Email is required.')
+        .email('Email is invalid.'),
       password: yup
         .string()
-        .required('Password is required')
+        .required('Password is required.')
         .matches(new RegExp(`^[a-zA-Z0-9${passwordSpecialCharactersDoubleEscaped}]+$`),
           `Password can only contain Latin letters, numbers, and following special characters: ${passwordSpecialCharacters}.`)
-        .min(8, 'Password is too short - should be minimum 8 characters')
-        .matches(/[A-Z]/, 'Password must contain at least one uppercase letter')
-        .matches(/[a-z]/, 'Password must contain at least one lowercase letter')
+        .min(8, 'Password is too short - should be minimum 8 characters.')
+        .matches(/[A-Z]/, 'Password must contain at least one uppercase letter.')
+        .matches(/[a-z]/, 'Password must contain at least one lowercase letter.')
         .matches(/[0-9]+/, 'Password must contain at least one digit.')
         .matches(new RegExp(`[${passwordSpecialCharactersDoubleEscaped}]+`),
           'Password must contain at least one special character.')
@@ -71,7 +77,11 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
 
 const sendVerificationEmail = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { email } = req.body;
+    let { email } = req.body;
+
+    // Validate email
+    if (!validator.isEmail(email)) return res.status(400).send('Email is invalid.');
+    email = validator.normalizeEmail(email);
 
     // Send verification email
     const { accepted, messageId } = await mailer.sendVerificationPendingEmail(email);

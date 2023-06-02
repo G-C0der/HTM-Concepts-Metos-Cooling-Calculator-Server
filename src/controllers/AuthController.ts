@@ -4,18 +4,24 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import {authSecret} from "../config";
 import moment from "moment";
+import validator from 'validator';
 
 const login = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { email, password } = req.body;
+    let { email } = req.body;
+    const { password } = req.body;
+
+    // Validate email
+    if (!validator.isEmail(email)) return res.status(400).send('Email is invalid.');
+    email = validator.normalizeEmail(email);
 
     // Find user with email
     const user: User | null = await User.findOne({ where: { email } });
-    if (!user) return res.status(400).send('Invalid credentials.');
+    if (!user) return res.status(400).send('Credentials are invalid.');
 
     // Verify password
     const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) return res.status(400).send('Invalid credentials.')
+    if (!isPasswordValid) return res.status(400).send('Credentials are invalid.')
 
     // Create token
     if (!authSecret) return res.status(500).send('Internal server error.');
