@@ -9,7 +9,7 @@ class UserService {
     if (!verificationSecret) throw new Error('Error generating verification URL. Error: verification secret ' +
       'not provided');
     const token = jwt.sign({ id: this.user.id }, verificationSecret, { expiresIn: '1d' });
-    return new URL(`/verify/${token}`, clientBaseUrl).toString();
+    return new URL(`/verification/${token}`, clientBaseUrl).toString();
   };
 }
 
