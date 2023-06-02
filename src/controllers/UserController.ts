@@ -127,10 +127,10 @@ const verify = async (req: Request, res: Response, next: NextFunction) => {
     try {
       ({ id } = jwt.verify(token, verificationSecret) as jwt.JwtPayload);
     } catch (err) {
-      if (err instanceof jwt.JsonWebTokenError) {
-        return res.status(400).send('User verification failed.');
-      } else if (err instanceof jwt.TokenExpiredError) {
+      if (err instanceof jwt.TokenExpiredError) {
         return res.status(400).send('Your verification link has expired.');
+      } else if (err instanceof jwt.JsonWebTokenError) {
+        return res.status(400).send('User verification failed.');
       }
     }
 
