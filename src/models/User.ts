@@ -35,7 +35,7 @@ User.init({
     allowNull: false,
     unique: true,
     set (value: string) {
-      this.setDataValue('email', value.trim())
+      this.setDataValue('email', value.trim());
     }
   },
   password: {
@@ -60,61 +60,61 @@ User.init({
   title: {
     type: new DataTypes.STRING(64),
     set (value: string) {
-      this.setDataValue('title', value.trim())
+      this.setDataValue('title', value.trim());
     }
   },
   fname: {
     type: new DataTypes.STRING(64),
     set (value: string) {
-      this.setDataValue('fname', value.trim())
+      this.setDataValue('fname', value.trim());
     }
   },
   lname: {
     type: new DataTypes.STRING(64),
     set (value: string) {
-      this.setDataValue('lname', value.trim())
+      this.setDataValue('lname', value.trim());
     }
   },
   phone: {
     type: new DataTypes.STRING(32),
     set (value: string) {
-      this.setDataValue('phone', value.trim())
+      this.setDataValue('phone', value.trim());
     }
   },
   country: {
     type: new DataTypes.STRING(64),
     set (value: string) {
-      this.setDataValue('country', value.trim())
+      this.setDataValue('country', value.trim());
     }
   },
   city: {
     type: new DataTypes.STRING(64),
     set (value: string) {
-      this.setDataValue('city', value.trim())
+      this.setDataValue('city', value.trim());
     }
   },
   zip: {
     type: new DataTypes.STRING(16),
     set (value: string) {
-      this.setDataValue('zip', value.trim())
+      this.setDataValue('zip', value.trim());
     }
   },
   street: {
     type: new DataTypes.STRING(128),
     set (value: string) {
-      this.setDataValue('street', value.trim())
+      this.setDataValue('street', value.trim());
     }
   },
   company: {
     type: new DataTypes.STRING(256),
     set (value: string) {
-      this.setDataValue('company', value.trim())
+      this.setDataValue('company', value.trim());
     }
   },
   website: {
     type: new DataTypes.STRING(512),
     set (value: string) {
-      this.setDataValue('website', value.trim())
+      this.setDataValue('website', value.trim());
     }
   }
 },
