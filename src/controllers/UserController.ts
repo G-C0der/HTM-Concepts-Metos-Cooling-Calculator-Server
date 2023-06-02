@@ -94,9 +94,10 @@ const sendVerificationEmail = async (req: Request, res: Response, next: NextFunc
     // Check if user exists
     const user = await User.findOne({
       where: { email },
-      attributes: ['id']
+      attributes: ['id', 'verified']
     });
     if (!user) return res.status(400).send('A user with the specified email doesn\'t exists.');
+    if (user.verified) return res.status(400).send('User Account has already been verified.');
 
     // Create verification URL
     const userService = new UserService(user);
