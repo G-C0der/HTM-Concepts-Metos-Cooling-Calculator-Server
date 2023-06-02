@@ -6,6 +6,8 @@ import {authSecret} from "../config";
 import moment from "moment";
 import validator from 'validator';
 
+const serverError = 'Internal server error.';
+
 const login = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email, password } = req.body;
@@ -36,7 +38,8 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
       expiration
     });
   } catch (err) {
-    res.status(500).send('Internal server error.');
+    console.error(`${serverError} Error: ${err}`);
+    res.status(500).send(serverError);
     next(err);
   }
 };

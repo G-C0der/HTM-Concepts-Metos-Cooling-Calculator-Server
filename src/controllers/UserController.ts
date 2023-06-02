@@ -76,6 +76,7 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
       wasVerificationEmailSent: ((accepted && accepted[0] === email) && !!messageId)
     });
   } catch (err) {
+    console.error(`${serverError} Error: ${err}`);
     res.status(500).send(serverError);
     next(err);
   }
@@ -107,6 +108,7 @@ const sendVerificationEmail = async (req: Request, res: Response, next: NextFunc
       wasVerificationEmailSent: ((accepted && accepted[0] === email) && !!messageId)
     });
   } catch (err) {
+    console.error(`${serverError} Error: ${err}`);
     res.status(500).send(serverError);
     next(err);
   }
