@@ -138,7 +138,7 @@ const verify = async (req: Request, res: Response, next: NextFunction) => {
       where: { id },
       attributes: ['verified']
     });
-    if (!user) return res.status(400).send('User verification failed.');
+    if (!user) return res.status(400).send('No user associated with this verification link.');
     if (user!.verified) return res.status(400).send('User Account has already been verified.');
 
     // Set user verified
@@ -146,10 +146,10 @@ const verify = async (req: Request, res: Response, next: NextFunction) => {
       { verified: true },
       { where: { id } }
     );
-    if (!updated) return res.status(400).send('User verification failed.');
+    if (!updated) return res.status(400).send('Unexpected error during verification. Please try again later');
 
     // Send response
-    res.status(200);
+    res.status(200).send('User verification succeeded.');
   } catch (err) {
     console.error(`${serverError} Error: ${err}`);
     res.status(500).send(serverError);
