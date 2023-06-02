@@ -8,12 +8,10 @@ import validator from 'validator';
 
 const login = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    let { email } = req.body;
-    const { password } = req.body;
+    const { email, password } = req.body;
 
     // Validate email
     if (!validator.isEmail(email)) return res.status(400).send('Email is invalid.');
-    email = validator.normalizeEmail(email);
 
     // Find user with email
     const user: User | null = await User.findOne({ where: { email } });

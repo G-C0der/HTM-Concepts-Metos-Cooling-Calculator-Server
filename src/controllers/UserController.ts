@@ -10,15 +10,13 @@ const serverError = 'Internal server error.';
 
 const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    let { email } = req.body;
-    const { password, tnc, ...otherFields } = req.body;
+    const { email, password, tnc, ...otherFields } = req.body;
 
     // Check if Terms and Conditions accepted
     if (!tnc) return res.status(400).send('You must accept the Terms and Conditions.');
 
     // Validate email
     if (!validator.isEmail(email)) return res.status(400).send('Email is invalid.');
-    email = validator.normalizeEmail(email);
 
     // Validate email and password
     const passwordSpecialCharacters = '*.!@#$%^&(){}[\]:;<>,.?\/~_+\-=|\\';
@@ -77,11 +75,10 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
 
 const sendVerificationEmail = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    let { email } = req.body;
+    const { email } = req.body;
 
     // Validate email
     if (!validator.isEmail(email)) return res.status(400).send('Email is invalid.');
-    email = validator.normalizeEmail(email);
 
     // Send verification email
     const { accepted, messageId } = await mailer.sendVerificationPendingEmail(email);
