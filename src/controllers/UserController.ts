@@ -70,7 +70,7 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
     const userService = new UserService(newUser);
     const verificationUrl = userService.generateVerificationUrl();
 
-    // Send verification email
+    // Send verification pending email
     const { accepted, messageId } = await mailer.sendVerificationPendingEmail(email, verificationUrl);
 
     // Send response
