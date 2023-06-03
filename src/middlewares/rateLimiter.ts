@@ -18,7 +18,7 @@ const endpointRateLimiters  = {
     max: 3, // limit each IP to 3 requests per windowMs
     message: 'Too many verification email requests created, please try again in 10 minutes.'
   }),
-  '/users/verification/:token': rateLimit({
+  '/users/verification/:token': rateLimit({ // TODO: this is currently never used, since the actual token is in the endpoint
     windowMs: min10, // 10 minutes
     max: 3, // limit each IP to 3 requests per windowMs
     message: 'Too many verification requests created, please try again in 10 minutes.'
