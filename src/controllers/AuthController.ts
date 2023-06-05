@@ -51,6 +51,17 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
+const getAuthenticatedUser = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    console.log('headers', req.headers)
+  } catch (err) {
+    console.error(`${serverError} Error: ${err}`);
+    res.status(500).send(serverError);
+    next(err);
+  }
+};
+
 export {
-  login
+  login,
+  getAuthenticatedUser
 };
