@@ -26,3 +26,5 @@ const sequelize = isHerokuHost
 export {
   sequelize
 };
+
+export * from './User';

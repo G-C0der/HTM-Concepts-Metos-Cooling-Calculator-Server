@@ -1,12 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
-import {User} from "../models/User";
+import {User} from "../models";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import {authSecret} from "../config";
+import {authSecret, verificationSecret} from "../config";
 import moment from "moment";
 import validator from 'validator';
-
-const serverError = 'Internal server error.';
+import {serverError} from "../constants";
 
 const login = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -53,7 +52,7 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
 
 const getAuthenticatedUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    console.log('headers', req.headers)
+    console.log('getAuthenticatedUser', req)
   } catch (err) {
     console.error(`${serverError} Error: ${err}`);
     res.status(500).send(serverError);

@@ -1,5 +1,5 @@
 import {NextFunction, Request, Response} from "express";
-import {User} from "../models/User";
+import {User} from "../models";
 import bcrypt from "bcrypt";
 import * as yup from 'yup';
 import {escapeForRegExp} from "../utils";
@@ -8,8 +8,7 @@ import validator from 'validator';
 import { UserService } from "../services";
 import jwt from "jsonwebtoken";
 import {htmConceptsEmail, verificationSecret} from "../config";
-
-const serverError = 'Internal server error.';
+import {serverError} from "../constants";
 
 const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
