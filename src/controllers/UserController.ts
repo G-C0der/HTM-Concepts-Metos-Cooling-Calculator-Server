@@ -96,7 +96,7 @@ const sendVerificationEmail = async (req: Request, res: Response, next: NextFunc
       where: { email },
       attributes: ['id', 'verified']
     });
-    if (!user) return res.status(400).send('A user with the specified email doesn\'t exists.');
+    if (!user) return res.status(400).send('A user with the specified email doesn\'t exist.');
     if (user.verified) return res.status(400).send('User Account has already been verified.');
 
     // Create verification URL
