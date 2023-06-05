@@ -9,7 +9,7 @@ const authenticate = async (req: Request, res: Response, next: NextFunction) => 
     // Get token
     let token = req.headers.authorization;
     if (token) token = token.substring('Bearer '.length);
-    if (!token) res.status(401).send('Unauthorized.');
+    if (!token) return res.status(401).send('Unauthorized.');
 
     // Validate token
     if (!authSecret) throw new Error('Error verifying user. Secret not provided.');
@@ -20,9 +20,12 @@ const authenticate = async (req: Request, res: Response, next: NextFunction) => 
       return res.status(401).send('Unauthorized.');
     }
 
-    // Get user and validate user
-    const user = await User.findOne({ where: { id } });
-    if (!user || !user.verified || !user.active) res.status(401).send('Unauthorized');
+    // Validate user
+    const user = await User.findOne({
+      where: { id },
+      attributes: ['active', 'verified', 'admin', 'email', 'fname', 'lname']
+    });
+    if (!user || !user.verified || !user.active) return res.status(401).send('Unauthorized');
 
     // Save user in request
     req.user = user!;

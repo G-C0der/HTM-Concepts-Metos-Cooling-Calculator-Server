@@ -17,7 +17,7 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
     // Find user with email
     const user: User | null = await User.findOne({
       where: { email },
-      attributes: ['password', 'verified', 'active', 'admin', 'email', 'fname', 'lname']
+      attributes: ['id', 'password', 'verified', 'active', 'admin', 'email', 'fname', 'lname']
     });
     if (!user) return res.status(400).send('Credentials are invalid.');
 
@@ -35,7 +35,7 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
     const expiration = moment().add(1, 'day').valueOf();
 
     // Prepare user object for client
-    const { dataValues: { password: pw, verified, active, ...userData } } = user;
+    const { dataValues: { id, password: pw, verified, active, ...userData } } = user;
 
     // Send response
     res.status(200).json({
@@ -52,7 +52,9 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
 
 const getAuthenticatedUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    console.log('getAuthenticatedUser', req)
+    return res.status(200).json({
+      user: req.user
+    });
   } catch (err) {
     console.error(`${serverError} Error: ${err}`);
     res.status(500).send(serverError);
