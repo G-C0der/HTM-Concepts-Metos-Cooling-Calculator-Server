@@ -3,6 +3,7 @@ import cors from 'cors';
 import router from './routes';
 import { sequelize } from './models';
 import {appPort} from "./config";
+import './types/Express';
 
 const app = express();
 const port = appPort || 4000;

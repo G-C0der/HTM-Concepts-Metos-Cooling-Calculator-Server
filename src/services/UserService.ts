@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import {clientBaseUrl, verificationSecret} from "../config";
-import {User} from "../models/User";
+import {User} from "../models";
 
 class UserService {
   constructor(private user: User) {}

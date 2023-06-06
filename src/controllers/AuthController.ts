@@ -1,12 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
-import {User} from "../models/User";
+import {User} from "../models";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import {authSecret} from "../config";
 import moment from "moment";
 import validator from 'validator';
-
-const serverError = 'Internal server error.';
+import {serverError} from "../constants";
 
 const login = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -18,7 +17,7 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
     // Find user with email
     const user: User | null = await User.findOne({
       where: { email },
-      attributes: ['password', 'verified', 'active', 'admin']
+      attributes: ['id', 'password', 'verified', 'active', 'admin', 'email', 'fname', 'lname']
     });
     if (!user) return res.status(400).send('Credentials are invalid.');
 
@@ -35,10 +34,26 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
     const token = jwt.sign({ id: user.id }, authSecret, { expiresIn: '1d' });
     const expiration = moment().add(1, 'day').valueOf();
 
+    // Prepare user object for client
+    const { dataValues: { id, password: pw, verified, active, ...userData } } = user;
+
     // Send response
     res.status(200).json({
       token,
-      expiration
+      expiration,
+      user: userData
+    });
+  } catch (err) {
+    console.error(`${serverError} Error: ${err}`);
+    res.status(500).send(serverError);
+    next(err);
+  }
+};
+
+const getAuthenticatedUser = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    return res.status(200).json({
+      user: req.user
     });
   } catch (err) {
     console.error(`${serverError} Error: ${err}`);
@@ -48,5 +63,6 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 export {
-  login
+  login,
+  getAuthenticatedUser
 };
