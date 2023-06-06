@@ -82,9 +82,9 @@ User.init({
     }
   },
   country: {
-    type: new DataTypes.STRING(64),
+    type: new DataTypes.STRING(2),
     set (value: string) {
-      this.setDataValue('country', value.trim());
+      this.setDataValue('country', value.trim().toLowerCase());
     }
   },
   city: {
