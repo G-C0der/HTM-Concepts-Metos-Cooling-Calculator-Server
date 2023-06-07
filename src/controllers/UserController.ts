@@ -215,7 +215,7 @@ const verifyResetPasswordToken = async (req: Request, res: Response, next: NextF
     // Check if user exists
     const user = await User.findOne({
       where: { id },
-      attributes: ['email', 'verified']
+      attributes: ['id']
     });
     if (!user) return res.status(400).send('No user associated with this verification link.');
 
@@ -234,7 +234,7 @@ const resetPassword = async (req: Request, res: Response, next: NextFunction) =>
     const { password } = req.body;
 
     // Validate token
-    if (!passwordResetSecret) throw new Error('Error verifying user. Secret not provided.');
+    if (!passwordResetSecret) throw new Error('Error resetting password user. Secret not provided.');
     let id;
     try {
       ({ id } = jwt.verify(token, passwordResetSecret) as jwt.JwtPayload);
@@ -249,7 +249,7 @@ const resetPassword = async (req: Request, res: Response, next: NextFunction) =>
     // Check if user exists
     const user = await User.findOne({
       where: { id },
-      attributes: ['email', 'verified']
+      attributes: ['id']
     });
     if (!user) return res.status(400).send('No user associated with this verification link.');
 
