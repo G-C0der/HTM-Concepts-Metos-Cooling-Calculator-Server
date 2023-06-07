@@ -130,7 +130,7 @@ const verify = async (req: Request, res: Response, next: NextFunction) => {
     // Validate token
     let user;
     try {
-      user = await userService.verifyToken(token, verificationSecret, ['email', 'verified']);
+      user = await userService.verifyToken(token, verificationSecret, ['id', 'email', 'verified']);
     } catch (err: any) {
       if (err instanceof VerificationError) return res.status(err.code).send(err.message);
       throw err;
