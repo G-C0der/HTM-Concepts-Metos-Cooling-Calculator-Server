@@ -1,2 +1,2 @@
 export { default as mailer } from './Mailer';
-export * from './UserService';
+export { default as userService } from './UserService';
