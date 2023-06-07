@@ -7,7 +7,7 @@ import {mailer} from "../services";
 import validator from 'validator';
 import { UserService } from "../services";
 import jwt from "jsonwebtoken";
-import {htmConceptsEmail, verificationSecret} from "../config";
+import {htmConceptsEmail, passwordResetSecret, verificationSecret} from "../config";
 import {serverError} from "../constants";
 
 const register = async (req: Request, res: Response, next: NextFunction) => {
@@ -67,14 +67,14 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
 
     // Create verification URL
     const userService = new UserService(newUser);
-    const verificationUrl = userService.generateVerificationUrl();
+    const verificationUrl = userService.generateVerificationUrl('/verification', '1d', verificationSecret);
 
     // Send verification pending email
     const { accepted, messageId } = await mailer.sendVerificationPendingEmail(email, verificationUrl);
 
     // Send response
     res.status(200).json({
-      wasVerificationEmailSent: ((accepted && accepted[0] === email) && !!messageId)
+      wasEmailSent: ((accepted && accepted[0] === email) && !!messageId)
     });
   } catch (err) {
     console.error(`${serverError} Error: ${err}`);
@@ -100,14 +100,14 @@ const sendVerificationEmail = async (req: Request, res: Response, next: NextFunc
 
     // Create verification URL
     const userService = new UserService(user);
-    const verificationUrl = userService.generateVerificationUrl();
+    const verificationUrl = userService.generateVerificationUrl('/verification', '1d', verificationSecret);
 
     // Send verification pending email
     const { accepted, messageId } = await mailer.sendVerificationPendingEmail(email, verificationUrl);
 
     // Send response
     res.status(200).json({
-      wasVerificationEmailSent: ((accepted && accepted[0] === email) && !!messageId)
+      wasEmailSent: ((accepted && accepted[0] === email) && !!messageId)
     });
   } catch (err) {
     console.error(`${serverError} Error: ${err}`);
@@ -146,7 +146,7 @@ const verify = async (req: Request, res: Response, next: NextFunction) => {
       { verified: true },
       { where: { id } }
     );
-    if (!updated) return res.status(400).send('Unexpected error during verification. Please try again later');
+    if (!updated) return res.status(500).send('Unexpected error during verification. Please try again later.');
 
     // Send verification done email
     mailer.sendVerificationDoneEmail(htmConceptsEmail, user.email);
@@ -163,8 +163,120 @@ const verify = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
+const sendResetPasswordEmail = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { email } = req.body;
+
+    // Validate email
+    if (!validator.isEmail(email)) return res.status(400).send('Email is invalid.');
+
+    // Check if user exists
+    const user = await User.findOne({
+      where: { email },
+      attributes: ['id']
+    });
+    if (!user) return res.status(400).send('A user with the specified email doesn\'t exist.');
+
+    // Create reset password URL
+    const userService = new UserService(user);
+    const passwordResetUrl = userService.generateVerificationUrl('/reset-password', '1h', passwordResetSecret);
+
+    // Send verification pending email
+    const { accepted, messageId } = await mailer.sendPasswordResetPendingEmail(email, passwordResetUrl);
+
+    // Send response
+    res.status(200).json({
+      wasEmailSent: ((accepted && accepted[0] === email) && !!messageId)
+    });
+  } catch (err) {
+    console.error(`${serverError} Error: ${err}`);
+    res.status(500).send(serverError);
+    next(err);
+  }
+};
+
+const verifyResetPasswordToken = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { token } = req.params;
+
+    // Validate token
+    if (!passwordResetSecret) throw new Error('Error verifying user. Secret not provided.');
+    let id;
+    try {
+      ({ id } = jwt.verify(token, passwordResetSecret) as jwt.JwtPayload);
+    } catch (err) {
+      if (err instanceof jwt.TokenExpiredError) {
+        return res.status(400).send('Your verification link has expired.');
+      } else if (err instanceof jwt.JsonWebTokenError) {
+        return res.status(400).send('User verification failed.');
+      }
+    }
+
+    // Check if user exists
+    const user = await User.findOne({
+      where: { id },
+      attributes: ['email', 'verified']
+    });
+    if (!user) return res.status(400).send('No user associated with this verification link.');
+
+    // Send response
+    res.status(200).send('User verification succeeded.');
+  } catch (err) {
+    console.error(`${serverError} Error: ${err}`);
+    res.status(500).send(serverError);
+    next(err);
+  }
+};
+
+const resetPassword = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { token } = req.params;
+    const { password } = req.body;
+
+    // Validate token
+    if (!passwordResetSecret) throw new Error('Error verifying user. Secret not provided.');
+    let id;
+    try {
+      ({ id } = jwt.verify(token, passwordResetSecret) as jwt.JwtPayload);
+    } catch (err) {
+      if (err instanceof jwt.TokenExpiredError) {
+        return res.status(400).send('Your verification link has expired.');
+      } else if (err instanceof jwt.JsonWebTokenError) {
+        return res.status(400).send('User verification failed.');
+      }
+    }
+
+    // Check if user exists
+    const user = await User.findOne({
+      where: { id },
+      attributes: ['email', 'verified']
+    });
+    if (!user) return res.status(400).send('No user associated with this verification link.');
+
+    // Hash password
+    const hash = await bcrypt.hash(password, 10);
+
+    // Set user password
+    const updated = await User.update(
+      { password: hash },
+      { where: { id } }
+    );
+    if (!updated) return res.status(500).send('Unexpected error during password reset. Please try again later.');
+
+    // Send response
+    res.status(200).send('Password reset succeeded.');
+  } catch (err) {
+    console.error(`${serverError} Error: ${err}`);
+    res.status(500).send(serverError);
+    next(err);
+  }
+};
+
 export {
   register,
   sendVerificationEmail,
-  verify
+  verify,
+  sendResetPasswordEmail,
+  verifyResetPasswordToken,
+  resetPassword
 };

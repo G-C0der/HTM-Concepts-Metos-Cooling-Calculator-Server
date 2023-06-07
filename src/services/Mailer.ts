@@ -89,8 +89,18 @@ class Mailer {
     const templatePath = path.join(__dirname, '../templates/activationDoneEmail.ejs');
     return await this.sendEmail(
       userEmail,
-      'Cooling Calculator - Your Account is Now Active',
+      'Cooling Calculator - Your User Account is Now Active',
       templatePath
+    );
+  };
+
+  sendPasswordResetPendingEmail = async (userEmail: string, passwordResetUrl: string) => {
+    const templatePath = path.join(__dirname, '../templates/passwordResetPendingEmail.ejs');
+    return await this.sendEmail(
+      userEmail,
+      'Cooling Calculator - Reset Your User Account Password',
+      templatePath,
+      { passwordResetUrl }
     );
   };
 }

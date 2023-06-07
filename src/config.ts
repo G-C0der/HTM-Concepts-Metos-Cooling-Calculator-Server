@@ -12,6 +12,7 @@ const databasePassword = process.env.DB_PASSWORD;
 
 const authSecret = process.env.AUTH_SECRET;
 const verificationSecret = process.env.VERIFICATION_SECRET;
+const passwordResetSecret = process.env.PASSWORD_RESET_SECRET;
 
 const smtpExchangeHost = process.env.SMTP_EXCHANGE_HOST;
 const smtpExchangePort = process.env.SMTP_EXCHANGE_PORT;
@@ -35,6 +36,7 @@ export {
 
   authSecret,
   verificationSecret,
+  passwordResetSecret,
 
   smtpExchangeHost,
   smtpExchangePort,
