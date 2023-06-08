@@ -21,7 +21,7 @@ class UserService {
     } catch (err) {
       if (err instanceof jwt.TokenExpiredError) {
         throw new VerificationError(400, 'Your verification link has expired.');
-      } else if (err instanceof jwt.JsonWebTokenError) {
+      } else {
         throw new VerificationError(400, 'User verification failed.');
       }
     }
