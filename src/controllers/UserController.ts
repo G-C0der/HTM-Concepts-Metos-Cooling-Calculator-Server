@@ -209,7 +209,7 @@ const verifyResetPasswordToken = async (req: Request, res: Response, next: NextF
     }
 
     // Send response
-    res.status(200).send('User verification succeeded.');
+    res.status(200).send('Password reset user verification succeeded.');
   } catch (err) {
     console.error(`${serverError} Error: ${err}`);
     res.status(500).send(serverError);
