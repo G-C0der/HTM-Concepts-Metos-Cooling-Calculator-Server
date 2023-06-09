@@ -130,7 +130,7 @@ const verify = async (req: Request, res: Response, next: NextFunction) => {
     // Validate token
     let user;
     try {
-      user = await userService.verifyToken(token, verificationSecret, ['id', 'email', 'verified']);
+      user = await userService.verifyToken(token, verificationSecret, false, ['id', 'email', 'verified']);
     } catch (err: any) {
       if (err instanceof VerificationError) return res.status(err.code).send(err.message);
       throw err;
@@ -202,7 +202,7 @@ const verifyResetPasswordToken = async (req: Request, res: Response, next: NextF
 
     // Validate token
     try {
-      await userService.verifyToken(token, passwordResetSecret);
+      await userService.verifyToken(token, passwordResetSecret, true);
     } catch (err: any) {
       if (err instanceof VerificationError) return res.status(err.code).send(err.message);
       throw err;
@@ -225,7 +225,7 @@ const resetPassword = async (req: Request, res: Response, next: NextFunction) =>
     // Validate token
     let id;
     try {
-      ({ id } = await userService.verifyToken(token, passwordResetSecret));
+      ({ id } = await userService.verifyToken(token, passwordResetSecret, true));
     } catch (err: any) {
       if (err instanceof VerificationError) return res.status(err.code).send(err.message);
       throw err;
