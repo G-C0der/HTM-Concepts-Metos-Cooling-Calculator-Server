@@ -13,7 +13,7 @@ const endpointRateLimiters  = {
     max: 10, // limit each IP to 10 requests per windowMs
     message: 'Too many registration requests created, please try again in 10 minutes.'
   }),
-  '/users/verification/send': rateLimit({
+  '/users/verification': rateLimit({
     windowMs: min10, // 10 minutes
     max: 3, // limit each IP to 3 requests per windowMs
     message: 'Too many verification email requests created, please try again in 10 minutes.'
@@ -23,9 +23,19 @@ const endpointRateLimiters  = {
     max: 3, // limit each IP to 3 requests per windowMs
     message: 'Too many verification requests created, please try again in 10 minutes.'
   }),
+  '/users/password-reset': rateLimit({
+    windowMs: min10, // 10 minutes
+    max: 3, // limit each IP to 3 requests per windowMs
+    message: 'Too many password reset email requests created, please try again in 10 minutes.'
+  }),
+  '/users/password-reset/:token': rateLimit({ // TODO: this is currently never used, since the actual token is in the endpoint. Consider making endpoints more action oriented than restful, so verifyResetPasswordToken and resetPassword can be distinguished by path only.
+    windowMs: min10, // 10 minutes
+    max: 3, // limit each IP to 3 requests per windowMs
+    message: 'Too many password reset requests created, please try again in 10 minutes.'
+  }),
   default: rateLimit({
     windowMs: min10, // 10 minutes
-    max: 10, // limit each IP to 10 requests per windowMs
+    max: 3, // limit each IP to 10 requests per windowMs
     message: 'Too many requests created, please try again in 10 minutes.'
   }),
 };
