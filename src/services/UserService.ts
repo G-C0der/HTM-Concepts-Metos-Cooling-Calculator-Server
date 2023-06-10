@@ -61,7 +61,7 @@ class UserService {
     const { dataValues: { password: _, ...newUser } } = await User.create(createData);
 
     // Log creation
-    await auditLogService.log(createActionType, operatorId ?? newUser.id, {}, newUser);
+    await auditLogService.log(createActionType, operatorId ?? newUser.id, newUser.id, {}, newUser);
 
     return newUser;
   };
@@ -85,7 +85,7 @@ class UserService {
       const { dataValues: { password, ...oldData } } = user;
       const loggableOldData = intersectProperties(oldData, updateData);
       const { password: _, ...loggableUpdateData } = updateData;
-      await auditLogService.log(updateActionType, operatorId ?? userId, loggableOldData, loggableUpdateData);
+      await auditLogService.log(updateActionType, operatorId ?? userId, userId, loggableOldData, loggableUpdateData);
     }
 
     return updated;

@@ -27,6 +27,14 @@ AuditLog.init({
       key: 'id'
     }
   },
+  user: {
+    type: DataTypes.INTEGER.UNSIGNED,
+    allowNull: false,
+    references: {
+      model: 'users',
+      key: 'id'
+    }
+  },
   before: {
     type: DataTypes.JSON,
     allowNull: false

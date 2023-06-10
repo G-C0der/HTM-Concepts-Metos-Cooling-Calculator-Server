@@ -8,11 +8,13 @@ class AuditLogService {
   log = async (
     action: ActionType,
     operator: number,
+    user: number,
     before: object,
     after: object
   ) => await AuditLog.create({
     action,
     operator,
+    user,
     before,
     after
   });
