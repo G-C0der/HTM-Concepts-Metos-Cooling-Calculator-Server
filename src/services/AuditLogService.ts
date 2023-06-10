@@ -1,7 +1,7 @@
 import {AuditLog} from "../models";
 
 type CreateActionType = 'registration';
-type UpdateActionType = 'verification' | 'password-reset' | 'profile-update';
+type UpdateActionType = 'verification' | 'passwordReset' | 'profileUpdate';
 type ActionType = CreateActionType | UpdateActionType;
 
 class AuditLogService {

@@ -232,7 +232,7 @@ const resetPassword = async (req: Request, res: Response, next: NextFunction) =>
     const hash = await bcrypt.hash(password, 10);
 
     // Set user password
-    const updated = await userService.update('password-reset', { password: hash }, id);
+    const updated = await userService.update('passwordReset', { password: hash }, id);
     if (!updated) return res.status(500).send('Unexpected error during password reset. Please try again later.');
 
     // Send response
