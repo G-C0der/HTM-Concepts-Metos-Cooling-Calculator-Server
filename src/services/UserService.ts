@@ -4,6 +4,7 @@ import {User} from "../models";
 import _path from 'path';
 import {ServerError, VerificationError} from "../errors";
 import {auditLogService, CreateActionType, UpdateActionType} from "./";
+import {intersectProperties} from "../utils";
 
 class UserService {
   generateVerificationUrl = (
@@ -81,7 +82,8 @@ class UserService {
 
     // Log update
     if(updated) {
-      const { dataValues: { password, ...loggableOldData } } = user;
+      const { dataValues: { password, ...oldData } } = user;
+      const loggableOldData = intersectProperties(oldData, updateData);
       const { password: _, ...loggableUpdateData } = updateData;
       await auditLogService.log(updateActionType, operatorId ?? userId, loggableOldData, loggableUpdateData);
     }
