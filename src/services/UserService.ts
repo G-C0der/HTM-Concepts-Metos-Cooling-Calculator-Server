@@ -2,11 +2,16 @@ import jwt from "jsonwebtoken";
 import {clientBaseUrl} from "../config";
 import {User} from "../models";
 import _path from 'path';
-import {VerificationError} from "../errors/VerificationError";
-import {ServerError} from "../errors/ServerError";
+import {ServerError, VerificationError} from "../errors";
+import {auditLogService, CreateActionType, UpdateActionType} from "./";
 
 class UserService {
-  generateVerificationUrl = (path: string, userId: number, expiresIn: string, secret?: string) => {
+  generateVerificationUrl = (
+    path: string,
+    userId: number,
+    expiresIn: string,
+    secret?: string
+  ) => {
     if (!secret) throw new ServerError(500, 'Error generating URL. Secret not provided.');
     const token = jwt.sign({ id: userId, issuedAt: Date.now() }, secret, { expiresIn });
     return new URL(_path.join(path, token), clientBaseUrl).toString();
@@ -44,6 +49,44 @@ class UserService {
     }
 
     return user;
+  };
+
+  create = async (
+    createActionType: CreateActionType,
+    createData: Partial<User>,
+    operatorId?: number
+  ) => {
+    // Create user
+    const { dataValues: { password: _, ...newUser } } = await User.create(createData);
+
+    // Log creation
+    await auditLogService.log(createActionType, operatorId ?? newUser.id, {}, newUser);
+
+    return newUser;
+  };
+
+  update = async (
+    updateActionType: UpdateActionType,
+    updateData: Partial<User>,
+    userId: number,
+    operatorId?: number
+  ) => {
+    // Query old data
+    const query = { where: { id: userId } };
+    const user = await User.findOne(query);
+    if (!user) return false;
+
+    // Update user
+    const updated = await User.update(updateData, query);
+
+    // Log update
+    if(updated) {
+      const { password, ...loggableOldData } = user;
+      const { password: _, ...loggableUpdateData } = updateData;
+      await auditLogService.log(updateActionType, operatorId ?? userId, loggableOldData, loggableUpdateData);
+    }
+
+    return updated;
   };
 }
 
