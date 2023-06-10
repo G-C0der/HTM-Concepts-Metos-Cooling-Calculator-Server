@@ -7,7 +7,7 @@ import {mailer, userService} from "../services";
 import validator from 'validator';
 import {htmConceptsEmail, passwordResetSecret, verificationSecret} from "../config";
 import {serverError} from "../constants";
-import {VerificationError} from "../errors/VerificationError";
+import {VerificationError} from "../errors";
 
 const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -179,7 +179,7 @@ const sendResetPasswordEmail = async (req: Request, res: Response, next: NextFun
       passwordResetSecret
     );
 
-    // Send verification pending email
+    // Send reset password pending email
     const { accepted, messageId } = await mailer.sendPasswordResetPendingEmail(email, passwordResetUrl);
 
     // Send response

@@ -31,9 +31,9 @@ class UserService {
       ({ id, issuedAt } = jwt.verify(token, secret) as jwt.JwtPayload);
     } catch (err) {
       if (err instanceof jwt.TokenExpiredError) {
-        throw new VerificationError(400, 'Your verification URL has expired.');
+        throw new VerificationError(400, 'Your URL has expired.');
       } else {
-        throw new VerificationError(400, 'Your verification URL is invalid.');
+        throw new VerificationError(400, 'Your URL is invalid.');
       }
     }
 
@@ -43,10 +43,10 @@ class UserService {
       where: { id },
       attributes: userAttributes
     });
-    if (!user) throw new VerificationError(400, 'No user associated with this verification URL.');
+    if (!user) throw new VerificationError(400, 'No user associated with this URL.');
     if (invalidateIfUserChanged) {
       const updatedAt = new Date(user.updatedAt).getTime();
-      if (updatedAt > issuedAt) throw new VerificationError(400, 'Your verification URL is invalid.');
+      if (updatedAt > issuedAt) throw new VerificationError(400, 'Your URL is invalid.');
     }
 
     return user;
