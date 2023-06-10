@@ -7,7 +7,7 @@ import {mailer, userService} from "../services";
 import validator from 'validator';
 import {htmConceptsEmail, passwordResetSecret, verificationSecret} from "../config";
 import {serverError} from "../constants";
-import {VerificationError} from "../errors/VerificationError";
+import {VerificationError} from "../errors";
 
 const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -58,7 +58,7 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
     const hash = await bcrypt.hash(password, 10);
 
     // Create user
-    const { dataValues: { password: pw, ...newUser } } = await User.create({
+    const newUser = await userService.create('registration', {
       email,
       password: hash,
       ...otherFields
@@ -139,10 +139,7 @@ const verify = async (req: Request, res: Response, next: NextFunction) => {
     if (user!.verified) return res.status(400).send('User Account has already been verified.');
 
     // Set user verified
-    const updated = await User.update(
-      { verified: true },
-      { where: { id: user.id } }
-    );
+    const updated = await userService.update('verification', { verified: true }, user.id);
     if (!updated) return res.status(500).send('Unexpected error during verification. Please try again later.');
 
     // Send verification done email
@@ -182,7 +179,7 @@ const sendResetPasswordEmail = async (req: Request, res: Response, next: NextFun
       passwordResetSecret
     );
 
-    // Send verification pending email
+    // Send reset password pending email
     const { accepted, messageId } = await mailer.sendPasswordResetPendingEmail(email, passwordResetUrl);
 
     // Send response
@@ -235,10 +232,7 @@ const resetPassword = async (req: Request, res: Response, next: NextFunction) =>
     const hash = await bcrypt.hash(password, 10);
 
     // Set user password
-    const updated = await User.update(
-      { password: hash },
-      { where: { id } }
-    );
+    const updated = await userService.update('passwordReset', { password: hash }, id);
     if (!updated) return res.status(500).send('Unexpected error during password reset. Please try again later.');
 
     // Send response

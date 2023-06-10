@@ -23,8 +23,15 @@ const sequelize = isHerokuHost
       }
     );
 
-export {
-  sequelize
-};
+// Models initialization
+import { User } from './User';
+import { AuditLog } from './AuditLog';
 
-export * from './User';
+// Relations setup
+import './relations';
+
+export {
+  sequelize,
+  User,
+  AuditLog
+};

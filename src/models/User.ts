@@ -1,5 +1,5 @@
 import { DataTypes, Model } from 'sequelize';
-import { sequelize } from './index';
+import {sequelize} from './';
 
 class User extends Model {
   public id!: number;
@@ -120,7 +120,7 @@ User.init({
 },
 {
   sequelize,
-  tableName: 'users',
+  tableName: 'users'
 });
 
 export {
