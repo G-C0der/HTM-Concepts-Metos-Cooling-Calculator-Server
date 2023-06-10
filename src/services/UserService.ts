@@ -81,7 +81,7 @@ class UserService {
 
     // Log update
     if(updated) {
-      const { password, ...loggableOldData } = user;
+      const { dataValues: { password, ...loggableOldData } } = user;
       const { password: _, ...loggableUpdateData } = updateData;
       await auditLogService.log(updateActionType, operatorId ?? userId, loggableOldData, loggableUpdateData);
     }
