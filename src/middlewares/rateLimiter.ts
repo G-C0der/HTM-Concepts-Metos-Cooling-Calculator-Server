@@ -4,7 +4,7 @@ import redis from 'redis';
 const RedisStore = require('rate-limit-redis').default;
 import {isProdEnv, redisUrl} from "../config";
 import {login} from "../controllers/AuthController";
-import {ServerError} from "../errors/ServerError";
+import {ServerError} from "../errors";
 
 type HttpMethod = 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE';
 
@@ -13,19 +13,7 @@ interface HttpEndpoint {
   normalizedPath: string;
 }
 
-// Connect to redis client if on prod env
-let redisClient: any;
-(async () => {
-  if (isProdEnv) {
-    redisClient = redis.createClient({
-      url: redisUrl
-    });
-
-    await redisClient.connect();
-  }
-})();
-
-const endpointLimitMap = [
+const endpointLimits = [
   { endpoint: 'POST:/auth', max: 10, description: 'login' },
   { endpoint: 'POST:/users', max: 10, description: 'registration' },
   { endpoint: 'POST:/users/verification', max: 3, description: 'verification email' },
@@ -35,19 +23,32 @@ const endpointLimitMap = [
   { endpoint: 'PATCH:/users/password-reset/:token', max: 3, description: 'password reset' },
 ];
 
-const endpointRateLimiters: any = endpointLimitMap.reduce((acc, { endpoint, max, description }) =>
-  ({...acc, [endpoint]: rateLimit({
-    windowMs: 10 * 60 * 1000, // 10 minutes
-    max, // Limit each IP to n requests per windowMs
-    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-    legacyHeaders: false, // Disable the `X-RateLimit-*` headers
-    message: `Too many ${description} requests created, please try again in 10 minutes.`,
-    ...(isProdEnv && {
-      store: new RedisStore({
-        sendCommand: (...args: string[]) => redisClient.sendCommand(args),
-      })
-    })
-  })}), {});
+let redisClient: any, endpointRateLimiters: any;
+(async () => {
+  // Connect to redis client if on prod env
+  if (isProdEnv) {
+    redisClient = redis.createClient({
+      url: redisUrl
+    });
+
+    await redisClient.connect();
+  }
+
+  // Set up rate limiters for each endpoint specified in endpointLimits
+  endpointRateLimiters = endpointLimits.reduce((acc, { endpoint, max, description }) =>
+    ({...acc, [endpoint]: rateLimit({
+        windowMs: 10 * 60 * 1000, // 10 minutes
+        max, // Limit each IP to n requests per windowMs
+        standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+        legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+        message: `Too many ${description} requests created, please try again in 10 minutes.`,
+        ...(isProdEnv && {
+          store: new RedisStore({
+            sendCommand: (...args: string[]) => redisClient.sendCommand(args),
+          })
+        })
+      })}), {});
+})();
 
 const rateLimiter = (req: Request, res: Response, next: NextFunction) => {
   try {
