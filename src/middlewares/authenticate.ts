@@ -13,7 +13,7 @@ const authenticate = async (req: Request, res: Response, next: NextFunction) => 
     if (!token) return res.status(401).send(unauthorizedError);
 
     // Validate token
-    if (!authSecret) throw new ServerError(500, 'Error verifying user. Secret not provided.');
+    if (!authSecret) throw new ServerError('Error verifying user. Secret not provided.');
     let id;
     try {
       ({ id } = jwt.verify(token!, authSecret) as jwt.JwtPayload);

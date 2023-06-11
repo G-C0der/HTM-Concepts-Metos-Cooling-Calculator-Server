@@ -2,6 +2,10 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+const env = process.env.NODE_ENV || "development";
+const isDevEnv = env === "development";
+const isProdEnv = env === "production";
+
 const appPort = process.env.PORT;
 
 const databaseName = process.env.DB_NAME;
@@ -23,9 +27,14 @@ const clientBaseUrl = process.env.CLIENT_BASE_URL || 'http://localhost:3000';
 
 const htmConceptsEmail = process.env.HTM_CONCEPTS_EMAIL || 'info@htm-concepts.ch';
 
-const jawsDBMariaURL = process.env.JAWSDB_MARIA_URL;
+const jawsDbMariaUrl = process.env.JAWSDB_MARIA_URL;
+
+const redisUrl = process.env.UPSTASH_REDIS_URL;
 
 export {
+  isDevEnv,
+  isProdEnv,
+
   appPort,
 
   databaseName,
@@ -46,5 +55,7 @@ export {
   clientBaseUrl,
   htmConceptsEmail,
 
-  jawsDBMariaURL
+  jawsDbMariaUrl,
+
+  redisUrl
 };

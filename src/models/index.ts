@@ -1,10 +1,8 @@
 import { Sequelize } from 'sequelize';
-import {databaseHost, databaseName, databasePassword, databaseUsername, jawsDBMariaURL} from "../config";
+import {databaseHost, databaseName, databasePassword, databaseUsername, isProdEnv, jawsDbMariaUrl} from "../config";
 
-const isHerokuHost = !!jawsDBMariaURL;
-
-const sequelize = isHerokuHost
-  ? new Sequelize(jawsDBMariaURL!, {
+const sequelize = isProdEnv
+  ? new Sequelize(jawsDbMariaUrl!, {
       dialect: 'mysql',
       protocol: 'mysql',
       dialectOptions: {

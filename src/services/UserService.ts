@@ -13,7 +13,7 @@ class UserService {
     expiresIn: string,
     secret?: string
   ) => {
-    if (!secret) throw new ServerError(500, 'Error generating URL. Secret not provided.');
+    if (!secret) throw new ServerError('Error generating URL. Secret not provided.');
     const token = jwt.sign({ id: userId, issuedAt: Date.now() }, secret, { expiresIn });
     return new URL(_path.join(path, token), clientBaseUrl).toString();
   };
@@ -25,7 +25,8 @@ class UserService {
     userAttributes: string[] = ['id']
   ): Promise<User> => {
     // Verify token
-    if (!secret) throw new ServerError(500, 'Error verifying token. Secret not provided.');
+
+    if (!secret) throw new ServerError('Error verifying token. Secret not provided.');
     let id, issuedAt;
     try {
       ({ id, issuedAt } = jwt.verify(token, secret) as jwt.JwtPayload);

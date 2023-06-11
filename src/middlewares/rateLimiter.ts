@@ -1,56 +1,83 @@
 import {NextFunction, Request, Response} from "express";
-import rateLimit from "express-rate-limit";
+const rateLimit = require("express-rate-limit");
+import redis from 'redis';
+const RedisStore = require('rate-limit-redis').default;
+import {isProdEnv, redisUrl} from "../config";
+import {login} from "../controllers/AuthController";
+import {ServerError} from "../errors/ServerError";
 
-const min10 = 10 * 60 * 1000; // 10 minutes
-const endpointRateLimiters  = {
-  '/auth': rateLimit({
-    windowMs: min10,
-    max: 10, // limit each IP to 10 requests per windowMs
-    message: 'Too many login requests created, please try again in 10 minutes.'
-  }),
-  '/users': rateLimit({
-    windowMs: min10,
-    max: 10, // limit each IP to 10 requests per windowMs
-    message: 'Too many registration requests created, please try again in 10 minutes.'
-  }),
-  '/users/verification': rateLimit({
-    windowMs: min10, // 10 minutes
-    max: 3, // limit each IP to 3 requests per windowMs
-    message: 'Too many verification email requests created, please try again in 10 minutes.'
-  }),
-  '/users/verification/:token': rateLimit({ // TODO: this is currently never used, since the actual token is in the endpoint
-    windowMs: min10, // 10 minutes
-    max: 3, // limit each IP to 3 requests per windowMs
-    message: 'Too many verification requests created, please try again in 10 minutes.'
-  }),
-  '/users/password-reset': rateLimit({
-    windowMs: min10, // 10 minutes
-    max: 3, // limit each IP to 3 requests per windowMs
-    message: 'Too many password reset email requests created, please try again in 10 minutes.'
-  }),
-  '/users/password-reset/:token': rateLimit({ // TODO: this is currently never used, since the actual token is in the endpoint. Consider making endpoints more action oriented than restful, so verifyResetPasswordToken and resetPassword can be distinguished by path only.
-    windowMs: min10, // 10 minutes
-    max: 3, // limit each IP to 3 requests per windowMs
-    message: 'Too many password reset requests created, please try again in 10 minutes.'
-  }),
-  default: rateLimit({
-    windowMs: min10, // 10 minutes
-    max: 3, // limit each IP to 10 requests per windowMs
-    message: 'Too many requests created, please try again in 10 minutes.'
-  }),
-};
+type HttpMethod = 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE';
+
+interface HttpEndpoint {
+  method: HttpMethod;
+  normalizedPath: string;
+}
+
+// Connect to redis client if on prod env
+let redisClient: any;
+(async () => {
+  if (isProdEnv) {
+    redisClient = redis.createClient({
+      url: redisUrl
+    });
+
+    await redisClient.connect();
+  }
+})();
+
+const endpointLimitMap = [
+  { endpoint: 'POST:/auth', max: 10, description: 'login' },
+  { endpoint: 'POST:/users', max: 10, description: 'registration' },
+  { endpoint: 'POST:/users/verification', max: 3, description: 'verification email' },
+  { endpoint: 'PATCH:/users/verification/:token', max: 3, description: 'verification' },
+  { endpoint: 'POST:/users/password-reset', max: 3, description: 'password reset email' },
+  { endpoint: 'GET:/users/password-reset/:token', max: 3, description: 'password reset' },
+  { endpoint: 'PATCH:/users/password-reset/:token', max: 3, description: 'password reset' },
+];
+
+const endpointRateLimiters: any = endpointLimitMap.reduce((acc, { endpoint, max, description }) =>
+  ({...acc, [endpoint]: rateLimit({
+    windowMs: 10 * 60 * 1000, // 10 minutes
+    max, // Limit each IP to n requests per windowMs
+    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+    legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+    message: `Too many ${description} requests created, please try again in 10 minutes.`,
+    ...(isProdEnv && {
+      store: new RedisStore({
+        sendCommand: (...args: string[]) => redisClient.sendCommand(args),
+      })
+    })
+  })}), {});
 
 const rateLimiter = (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { url: endpoint } = req;
+    const endpoint = getEndpointAsKey(req);
 
-    if (!(endpoint in endpointRateLimiters)) return endpointRateLimiters.default(req, res, next);
+    if (!(endpoint in endpointRateLimiters)) {
+      throw new ServerError(`Rate limiting requested but not specified for endpoint "${endpoint}".`);
+    }
 
     return endpointRateLimiters[endpoint as keyof typeof endpointRateLimiters](req, res, next);
   } catch (err) {
     console.error(`Error limiting endpoint calls. Error: ${err}`);
     next(err);
   }
+};
+
+const getEndpointAsKey = (req: Request) => Object.values(getEndpoint(req)).join(':');
+
+const getEndpoint = (req: Request): HttpEndpoint => ({
+  method: (req.method as HttpMethod),
+  normalizedPath: normalizePath(req)
+});
+
+const normalizePath = (req: Request): string => {
+  let { path } = req;
+  for (const key in req.params) {
+    const value = req.params[key];
+    path = path.replace(value, `:${key}`);
+  }
+  return path;
 };
 
 export {
