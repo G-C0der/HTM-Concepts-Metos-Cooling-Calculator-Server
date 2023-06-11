@@ -4,6 +4,7 @@ import redis from 'redis';
 const RedisStore = require('rate-limit-redis').default;
 import {isProdEnv, redisUrl} from "../config";
 import {login} from "../controllers/AuthController";
+import {ServerError} from "../errors/ServerError";
 
 type HttpMethod = 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE';
 
@@ -34,24 +35,27 @@ const endpointLimitMap = [
   { endpoint: 'PATCH:/users/password-reset/:token', max: 3, description: 'password reset' },
 ];
 
-const endpointRateLimiters: any = endpointLimitMap.reduce((acc, item) => ({...acc, [item.endpoint]: rateLimit({
+const endpointRateLimiters: any = endpointLimitMap.reduce((acc, { endpoint, max, description }) =>
+  ({...acc, [endpoint]: rateLimit({
     windowMs: 10 * 60 * 1000, // 10 minutes
-    max: item.max, // Limit each IP to n requests per windowMs
+    max, // Limit each IP to n requests per windowMs
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
-    message: `Too many ${item.description} requests created, please try again in 10 minutes.`,
+    message: `Too many ${description} requests created, please try again in 10 minutes.`,
     ...(isProdEnv && {
       store: new RedisStore({
         sendCommand: (...args: string[]) => redisClient.sendCommand(args),
       })
     })
-  })}));
+  })}), {});
 
 const rateLimiter = (req: Request, res: Response, next: NextFunction) => {
   try {
-    const endpoint = Object.values(getEndpoint(req)).join(':');
+    const endpoint = getEndpointAsKey(req);
 
-    if (!(endpoint in endpointRateLimiters)) return endpointRateLimiters.default(req, res, next);
+    if (!(endpoint in endpointRateLimiters)) {
+      throw new ServerError(`Rate limiting requested but not specified for endpoint "${endpoint}".`);
+    }
 
     return endpointRateLimiters[endpoint as keyof typeof endpointRateLimiters](req, res, next);
   } catch (err) {
@@ -59,6 +63,8 @@ const rateLimiter = (req: Request, res: Response, next: NextFunction) => {
     next(err);
   }
 };
+
+const getEndpointAsKey = (req: Request) => Object.values(getEndpoint(req)).join(':');
 
 const getEndpoint = (req: Request): HttpEndpoint => ({
   method: (req.method as HttpMethod),

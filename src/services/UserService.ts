@@ -14,7 +14,7 @@ class UserService {
 
   verifyToken = async (token: string, secret?: string, userAttributes: string[] = ['id']): Promise<User> => {
     // Verify token
-    if (!secret) throw new ServerError(500, 'Error verifying token. Secret not provided.');
+    if (!secret) throw new ServerError('Error verifying token. Secret not provided.');
     let id;
     try {
       ({ id } = jwt.verify(token, secret) as jwt.JwtPayload);
