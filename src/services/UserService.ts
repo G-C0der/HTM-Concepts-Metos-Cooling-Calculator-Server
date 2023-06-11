@@ -44,6 +44,8 @@ class UserService {
       attributes: userAttributes
     });
     if (!user) throw new VerificationError(400, 'No user associated with this URL.');
+
+    // Verify that user hasn't been updated since token has been issued
     if (invalidateIfUserChanged) {
       const updatedAt = new Date(user.updatedAt).getTime();
       if (updatedAt > issuedAt) throw new VerificationError(400, 'Your URL is invalid.');
