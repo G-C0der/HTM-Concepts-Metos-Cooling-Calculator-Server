@@ -5,6 +5,7 @@ import _path from 'path';
 import {ServerError, VerificationError} from "../errors";
 import {auditLogService, CreateActionType, UpdateActionType} from "./";
 import {intersectProperties} from "../utils";
+import {urlExpiredError, urlInvalidError, urlNoUserAssociatedError} from "../constants";
 
 class UserService {
   generateVerificationUrl = (
@@ -32,9 +33,9 @@ class UserService {
       ({ id, issuedAt } = jwt.verify(token, secret) as jwt.JwtPayload);
     } catch (err) {
       if (err instanceof jwt.TokenExpiredError) {
-        throw new VerificationError(400, 'Your URL has expired.');
+        throw new VerificationError(400, urlExpiredError);
       } else {
-        throw new VerificationError(400, 'Your URL is invalid.');
+        throw new VerificationError(400, urlInvalidError);
       }
     }
 
@@ -44,12 +45,12 @@ class UserService {
       where: { id },
       attributes: userAttributes
     });
-    if (!user) throw new VerificationError(400, 'No user associated with this URL.');
+    if (!user) throw new VerificationError(400, urlNoUserAssociatedError);
 
     // Verify that user hasn't been updated since token has been issued
     if (invalidateIfUserChanged) {
       const updatedAt = new Date(user.updatedAt).getTime();
-      if (updatedAt > issuedAt) throw new VerificationError(400, 'Your URL is invalid.');
+      if (updatedAt > issuedAt) throw new VerificationError(400, urlInvalidError);
     }
 
     return user;
