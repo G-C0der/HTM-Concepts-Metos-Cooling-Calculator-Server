@@ -14,13 +14,13 @@ interface HttpEndpoint {
 }
 
 const endpointLimits = [
-  { endpoint: 'POST:/auth', max: 10, description: 'login' },
-  { endpoint: 'POST:/users', max: 10, description: 'registration' },
-  { endpoint: 'POST:/users/verification', max: 3, description: 'verification email' },
-  { endpoint: 'PATCH:/users/verification/:token', max: 3, description: 'verification' },
-  { endpoint: 'POST:/users/password-reset', max: 3, description: 'password reset email' },
-  { endpoint: 'GET:/users/password-reset/:token', max: 3, description: 'password reset' },
-  { endpoint: 'PATCH:/users/password-reset/:token', max: 3, description: 'password reset' },
+  { endpoint: 'POST:/auth', max: 10, keyword: 'login' },
+  { endpoint: 'POST:/users', max: 10, keyword: 'registration' },
+  { endpoint: 'POST:/users/verification', max: 3, keyword: 'verification email' },
+  { endpoint: 'PATCH:/users/verification/:token', max: 3, keyword: 'verification' },
+  { endpoint: 'POST:/users/password-reset', max: 3, keyword: 'password reset email' },
+  { endpoint: 'GET:/users/password-reset/:token', max: 3, keyword: 'password reset' },
+  { endpoint: 'PATCH:/users/password-reset/:token', max: 3, keyword: 'password reset' },
 ];
 
 let redisClient: any, endpointRateLimiters: any;
@@ -35,13 +35,13 @@ let redisClient: any, endpointRateLimiters: any;
   }
 
   // Set up rate limiters for each endpoint specified in endpointLimits
-  endpointRateLimiters = endpointLimits.reduce((acc, { endpoint, max, description }) =>
+  endpointRateLimiters = endpointLimits.reduce((acc, { endpoint, max, keyword }) =>
     ({...acc, [endpoint]: rateLimit({
         windowMs: 10 * 60 * 1000, // 10 minutes
         max, // Limit each IP to n requests per windowMs
         standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
         legacyHeaders: false, // Disable the `X-RateLimit-*` headers
-        message: `Too many ${description} requests created, please try again in 10 minutes.`,
+        message: `Too many ${keyword} requests created, please try again in 10 minutes.`,
         ...(isProdEnv && {
           store: new RedisStore({
             sendCommand: (...args: string[]) => redisClient.sendCommand(args),
