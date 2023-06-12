@@ -1,6 +1,6 @@
 import {NextFunction, Request, Response} from "express";
 const rateLimit = require("express-rate-limit");
-import redis from 'redis';
+import { createClient } from '@redis/client'
 const RedisStore = require('rate-limit-redis').default;
 import {isProdEnv, redisUrl} from "../config";
 import {login} from "../controllers/AuthController";
@@ -27,7 +27,7 @@ let redisClient: any, endpointRateLimiters: any;
 (async () => {
   // Connect to redis client if on prod env
   if (isProdEnv) {
-    redisClient = redis.createClient({
+    redisClient = createClient({
       url: redisUrl
     });
 
