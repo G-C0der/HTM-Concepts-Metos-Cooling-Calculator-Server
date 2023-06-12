@@ -1,5 +1,6 @@
 import { DataTypes, Model } from 'sequelize';
 import {sequelize} from './';
+import {userFieldLengths} from "../constants/user";
 
 class User extends Model {
   public id!: number;
@@ -31,7 +32,7 @@ User.init({
     primaryKey: true
   },
   email: {
-    type: new DataTypes.STRING(128),
+    type: new DataTypes.STRING(userFieldLengths.email.max),
     allowNull: false,
     unique: true,
     set (value: string) {
@@ -58,61 +59,61 @@ User.init({
     defaultValue: false
   },
   title: {
-    type: new DataTypes.STRING(64),
+    type: new DataTypes.STRING(userFieldLengths.title.max),
     set (value: string) {
       this.setDataValue('title', value.trim());
     }
   },
   fname: {
-    type: new DataTypes.STRING(64),
+    type: new DataTypes.STRING(userFieldLengths.fname.max),
     set (value: string) {
       this.setDataValue('fname', value.trim());
     }
   },
   lname: {
-    type: new DataTypes.STRING(64),
+    type: new DataTypes.STRING(userFieldLengths.lname.max),
     set (value: string) {
       this.setDataValue('lname', value.trim());
     }
   },
   phone: {
-    type: new DataTypes.STRING(32),
+    type: new DataTypes.STRING(userFieldLengths.phone.max),
     set (value: string) {
       this.setDataValue('phone', value.trim());
     }
   },
   country: {
-    type: new DataTypes.STRING(2),
+    type: new DataTypes.STRING(userFieldLengths.country.max),
     set (value: string) {
       this.setDataValue('country', value.trim().toLowerCase());
     }
   },
   city: {
-    type: new DataTypes.STRING(64),
+    type: new DataTypes.STRING(userFieldLengths.city.max),
     set (value: string) {
       this.setDataValue('city', value.trim());
     }
   },
   zip: {
-    type: new DataTypes.STRING(16),
+    type: new DataTypes.STRING(userFieldLengths.zip.max),
     set (value: string) {
       this.setDataValue('zip', value.trim());
     }
   },
   street: {
-    type: new DataTypes.STRING(128),
+    type: new DataTypes.STRING(userFieldLengths.street.max),
     set (value: string) {
       this.setDataValue('street', value.trim());
     }
   },
   company: {
-    type: new DataTypes.STRING(256),
+    type: new DataTypes.STRING(userFieldLengths.company.max),
     set (value: string) {
       this.setDataValue('company', value.trim());
     }
   },
   website: {
-    type: new DataTypes.STRING(512),
+    type: new DataTypes.STRING(userFieldLengths.website.max),
     set (value: string) {
       this.setDataValue('website', value.trim());
     }

@@ -1,12 +1,12 @@
 import {AuditLog} from "../models";
 
-type CreateActionType = 'registration';
-type UpdateActionType = 'verification' | 'passwordReset' | 'profileUpdate';
-type ActionType = CreateActionType | UpdateActionType;
+type CreateAction = 'registration';
+type UpdateAction = 'verification' | 'passwordReset' | 'profileUpdate';
+type Action = CreateAction | UpdateAction;
 
 class AuditLogService {
   log = async (
-    action: ActionType,
+    action: Action,
     operator: number,
     user: number,
     before: object,
@@ -18,12 +18,21 @@ class AuditLogService {
     before,
     after
   });
+
+  getLastLog = async (action: Action, user: number): Promise<AuditLog | undefined> => {
+    const lastLog = await AuditLog.findOne({
+      where: { user, action },
+      order: [['createdAt', 'DESC']]
+    });
+
+    return lastLog?.dataValues;
+  };
 }
 
 export default new AuditLogService();
 
 export type {
-  ActionType,
-  CreateActionType,
-  UpdateActionType
+  Action,
+  CreateAction,
+  UpdateAction
 };

@@ -2,12 +2,12 @@ import {NextFunction, Request, Response} from "express";
 import {User} from "../models";
 import bcrypt from "bcrypt";
 import * as yup from 'yup';
-import {escapeForRegExp} from "../utils";
 import {mailer, userService} from "../services";
 import validator from 'validator';
 import {htmConceptsEmail, passwordResetSecret, verificationSecret} from "../config";
 import {serverError} from "../constants";
 import {VerificationError} from "../errors";
+import {emailValidationSchema, passwordValidationSchema} from "../constants/validationSchema";
 
 const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -20,27 +20,10 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
     if (!validator.isEmail(email)) return res.status(400).send('Email is invalid.');
 
     // Validate email and password
-    const passwordSpecialCharacters = '*.!@#$%^&(){}[\]:;<>,.?\/~_+\-=|\\';
-    const passwordSpecialCharactersDoubleEscaped = escapeForRegExp(passwordSpecialCharacters);
-
     const validationSchema = yup.object({
-      email: yup
-        .string()
-        .required('Email is required.')
-        .email('Email is invalid.'),
-      password: yup
-        .string()
-        .required('Password is required.')
-        .matches(new RegExp(`^[a-zA-Z0-9${passwordSpecialCharactersDoubleEscaped}]+$`),
-          `Password can only contain Latin letters, numbers, and following special characters: ${passwordSpecialCharacters}.`)
-        .min(8, 'Password is too short - should be minimum 8 characters.')
-        .matches(/[A-Z]/, 'Password must contain at least one uppercase letter.')
-        .matches(/[a-z]/, 'Password must contain at least one lowercase letter.')
-        .matches(/[0-9]+/, 'Password must contain at least one digit.')
-        .matches(new RegExp(`[${passwordSpecialCharactersDoubleEscaped}]+`),
-          'Password must contain at least one special character.')
+      email: emailValidationSchema,
+      password: passwordValidationSchema
     });
-
     try {
       await validationSchema.validate({ email, password }, { abortEarly: false });
     } catch (err: any) {
@@ -130,12 +113,13 @@ const verify = async (req: Request, res: Response, next: NextFunction) => {
     // Validate token
     let user;
     try {
-      user = await userService.verifyToken(token, verificationSecret, false, ['id', 'email', 'verified']);
+      user = await userService.verifyToken(token, verificationSecret, undefined, ['id', 'email', 'verified']);
     } catch (err: any) {
       if (err instanceof VerificationError) return res.status(err.code).send(err.message);
       throw err;
     }
 
+    // Check if user already verified
     if (user!.verified) return res.status(400).send('User Account has already been verified.');
 
     // Set user verified
@@ -199,7 +183,7 @@ const verifyResetPasswordToken = async (req: Request, res: Response, next: NextF
 
     // Validate token
     try {
-      await userService.verifyToken(token, passwordResetSecret, true);
+      await userService.verifyToken(token, passwordResetSecret, 'passwordReset');
     } catch (err: any) {
       if (err instanceof VerificationError) return res.status(err.code).send(err.message);
       throw err;
@@ -222,10 +206,20 @@ const resetPassword = async (req: Request, res: Response, next: NextFunction) =>
     // Validate token
     let id;
     try {
-      ({ id } = await userService.verifyToken(token, passwordResetSecret, true));
+      ({ id } = await userService.verifyToken(token, passwordResetSecret, 'passwordReset'));
     } catch (err: any) {
       if (err instanceof VerificationError) return res.status(err.code).send(err.message);
       throw err;
+    }
+
+    // Validate password
+    const validationSchema = yup.object({
+      password: passwordValidationSchema
+    });
+    try {
+      await validationSchema.validate({ password }, { abortEarly: false });
+    } catch (err: any) {
+      return res.status(400).send(err.errors[0]);
     }
 
     // Hash password

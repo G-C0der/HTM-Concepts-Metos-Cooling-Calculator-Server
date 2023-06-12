@@ -3,7 +3,7 @@ import {clientBaseUrl} from "../config";
 import {User} from "../models";
 import _path from 'path';
 import {ServerError, VerificationError} from "../errors";
-import {auditLogService, CreateActionType, UpdateActionType} from "./";
+import {Action, auditLogService, CreateAction, UpdateAction} from "./";
 import {intersectProperties} from "../utils";
 import {urlExpiredError, urlInvalidError, urlNoUserAssociatedError} from "../constants";
 
@@ -22,7 +22,7 @@ class UserService {
   verifyToken = async (
     token: string,
     secret?: string,
-    invalidateIfUserChanged: boolean = false,
+    invalidationAction?: Action,
     userAttributes: string[] = ['id']
   ): Promise<User> => {
     // Verify token
@@ -40,24 +40,26 @@ class UserService {
     }
 
     // Check if user exists
-    if (invalidateIfUserChanged && !userAttributes.includes('updatedAt')) userAttributes.push('updatedAt');
+    if (invalidationAction && !userAttributes.includes('id')) userAttributes.push('id');
     const user = await User.findOne({
       where: { id },
       attributes: userAttributes
     });
     if (!user) throw new VerificationError(400, urlNoUserAssociatedError);
 
-    // Verify that user hasn't been updated since token has been issued
-    if (invalidateIfUserChanged) {
-      const updatedAt = new Date(user.updatedAt).getTime();
-      if (updatedAt > issuedAt) throw new VerificationError(400, urlInvalidError);
+    // Verify that user hasn't done a specific action since token has been issued
+    invalidationActionIf: if (invalidationAction) {
+      const lastPasswordResetLog = await auditLogService.getLastLog(invalidationAction, user.id);
+      if (!lastPasswordResetLog) break invalidationActionIf;
+      const lastPasswordResetLogCreatedAt = new Date(lastPasswordResetLog.createdAt).getTime();
+      if (lastPasswordResetLogCreatedAt > issuedAt) throw new VerificationError(400, urlInvalidError);
     }
 
     return user;
   };
 
   create = async (
-    createActionType: CreateActionType,
+    createActionType: CreateAction,
     createData: Partial<User>,
     operatorId?: number
   ) => {
@@ -71,7 +73,7 @@ class UserService {
   };
 
   update = async (
-    updateActionType: UpdateActionType,
+    updateActionType: UpdateAction,
     updateData: Partial<User>,
     userId: number,
     operatorId?: number
