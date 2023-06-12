@@ -42,9 +42,10 @@ let redisClient: any, endpointRateLimiters: any;
         standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
         legacyHeaders: false, // Disable the `X-RateLimit-*` headers
         message: `Too many ${keyword} requests created, please try again in 10 minutes.`,
+        keyGenerator: () => endpoint,
         ...(isProdEnv && {
           store: new RedisStore({
-            sendCommand: (...args: string[]) => redisClient.sendCommand(args),
+            sendCommand: (...args: string[]) => redisClient.sendCommand(args)
           })
         })
       })}), {});
