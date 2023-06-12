@@ -29,7 +29,7 @@ const htmConceptsEmail = process.env.HTM_CONCEPTS_EMAIL || 'info@htm-concepts.ch
 
 const jawsDbMariaUrl = process.env.JAWSDB_MARIA_URL;
 
-const redisUrl = process.env.UPSTASH_REDIS_URL;
+const redisUrl = process.env.REDIS_URL;
 
 export {
   isDevEnv,
