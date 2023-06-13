@@ -31,6 +31,10 @@ let redisClient: any, endpointRateLimiters: any;
       url: redisUrl
     });
 
+    redisClient.on('error', (err: any) => {
+      console.error('Error occurred with Redis client: ', err);
+    });
+
     await redisClient.connect();
   }
 
