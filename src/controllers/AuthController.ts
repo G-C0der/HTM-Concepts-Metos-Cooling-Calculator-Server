@@ -5,7 +5,8 @@ import jwt from 'jsonwebtoken';
 import {authSecret} from "../config";
 import moment from "moment";
 import validator from 'validator';
-import {serverError} from "../constants";
+import {emailValidationSchema, passwordValidationSchema, serverError} from "../constants";
+import * as yup from 'yup';
 
 const login = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -13,6 +14,17 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
 
     // Validate email
     if (!validator.isEmail(email)) return res.status(400).send('Email is invalid.');
+
+    // Validate email and password
+    const validationSchema = yup.object({
+      email: emailValidationSchema,
+      password: passwordValidationSchema
+    });
+    try {
+      await validationSchema.validate({ email, password }, { abortEarly: false });
+    } catch (err: any) {
+      return res.status(400).send(err.errors[0]);
+    }
 
     // Find user with email
     const user: User | null = await User.findOne({
