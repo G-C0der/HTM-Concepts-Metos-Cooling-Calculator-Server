@@ -1,15 +1,17 @@
 import { Router } from 'express';
 import {
+  list,
   register, resetPassword,
   sendResetPasswordEmail,
   sendVerificationEmail,
   verify,
   verifyResetPasswordToken
 } from "../controllers/UserController";
-import {rateLimiter} from "../middlewares";
+import {authenticate, authorize, rateLimiter} from "../middlewares";
 
 const userRouter = Router();
 
+userRouter.get('/users', authenticate, authorize, list);
 userRouter.post('/users', rateLimiter, register);
 userRouter.post('/users/verification', rateLimiter, sendVerificationEmail);
 userRouter.patch('/users/verification/:token', rateLimiter, verify);

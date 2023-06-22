@@ -5,9 +5,22 @@ import * as yup from 'yup';
 import {mailer, userService} from "../services";
 import validator from 'validator';
 import {htmConceptsEmail, passwordResetSecret, verificationSecret} from "../config";
-import {serverError} from "../constants";
+import {serverError, emailValidationSchema, passwordValidationSchema} from "../constants";
 import {VerificationError} from "../errors";
-import {emailValidationSchema, passwordValidationSchema} from "../constants/validationSchema";
+
+const list = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const users = await User.findAll();
+
+    res.status(200).json({
+      users
+    });
+  } catch (err) {
+    console.error(`${serverError} Error: ${err}`);
+    res.status(500).send(serverError);
+    next(err);
+  }
+};
 
 const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -239,6 +252,7 @@ const resetPassword = async (req: Request, res: Response, next: NextFunction) =>
 };
 
 export {
+  list,
   register,
   sendVerificationEmail,
   verify,
