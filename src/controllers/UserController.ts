@@ -10,7 +10,14 @@ import {VerificationError} from "../errors";
 
 const list = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const users = await User.findAll();
+    const users = await User.findAll({
+      attributes: { exclude: ['password'] },
+      order: [
+        ['company', 'DESC'],
+        ['fname', 'DESC'],
+        ['lname', 'DESC']
+      ]
+    });
 
     res.status(200).json({
       users
