@@ -85,15 +85,6 @@ class Mailer {
     );
   };
 
-  sendActivationDoneEmail = async (userEmail: string) => {
-    const templatePath = path.join(__dirname, '../templates/activationDoneEmail.ejs');
-    return await this.sendEmail(
-      userEmail,
-      'Cooling Calculator - Your User Account is Now Active',
-      templatePath
-    );
-  };
-
   sendPasswordResetPendingEmail = async (userEmail: string, passwordResetUrl: string) => {
     const templatePath = path.join(__dirname, '../templates/passwordResetPendingEmail.ejs');
     return await this.sendEmail(
@@ -101,6 +92,15 @@ class Mailer {
       'Cooling Calculator - Reset Your User Account Password',
       templatePath,
       { passwordResetUrl }
+    );
+  };
+
+  sendActivationDoneEmail = async (userEmail: string) => {
+    const templatePath = path.join(__dirname, '../templates/activationDoneEmail.ejs');
+    return await this.sendEmail(
+      userEmail,
+      'Cooling Calculator - Your User Account is Now Active',
+      templatePath
     );
   };
 }

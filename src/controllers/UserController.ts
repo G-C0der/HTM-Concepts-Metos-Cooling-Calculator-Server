@@ -8,27 +8,6 @@ import {htmConceptsEmail, passwordResetSecret, verificationSecret} from "../conf
 import {serverError, emailValidationSchema, passwordValidationSchema} from "../constants";
 import {VerificationError} from "../errors";
 
-const list = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const users = await User.findAll({
-      attributes: { exclude: ['password'] },
-      order: [
-        ['company', 'ASC'],
-        ['fname', 'ASC'],
-        ['lname', 'ASC']
-      ]
-    });
-
-    res.status(200).json({
-      users
-    });
-  } catch (err) {
-    console.error(`${serverError} Error: ${err}`);
-    res.status(500).send(serverError);
-    next(err);
-  }
-};
-
 const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email, password, tnc, ...otherFields } = req.body;
@@ -143,8 +122,10 @@ const verify = async (req: Request, res: Response, next: NextFunction) => {
     if (user!.verified) return res.status(400).send('User Account has already been verified.');
 
     // Set user verified
-    const updated = await userService.update('verification', { verified: true }, user.id);
-    if (!updated) return res.status(500).send('Unexpected error during verification. Please try again later.');
+    const wasVerified = await userService.update('verification', { verified: true }, user.id);
+    if (!wasVerified) {
+      return res.status(500).send('Unexpected error during user verification. Please try again later.');
+    }
 
     // Send verification done email
     mailer.sendVerificationDoneEmail(htmConceptsEmail, user.email);
@@ -210,7 +191,7 @@ const verifyResetPasswordToken = async (req: Request, res: Response, next: NextF
     }
 
     // Send response
-    res.status(200).send('Password reset user verification succeeded.');
+    res.status(200).send('Password reset succeeded.');
   } catch (err) {
     console.error(`${serverError} Error: ${err}`);
     res.status(500).send(serverError);
@@ -220,8 +201,7 @@ const verifyResetPasswordToken = async (req: Request, res: Response, next: NextF
 
 const resetPassword = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { token } = req.params;
-    const { password } = req.body;
+    const { params: { token }, body: { password } } = req;
 
     // Validate token
     let id;
@@ -246,8 +226,8 @@ const resetPassword = async (req: Request, res: Response, next: NextFunction) =>
     const hash = await bcrypt.hash(password, 10);
 
     // Set user password
-    const updated = await userService.update('passwordReset', { password: hash }, id);
-    if (!updated) return res.status(500).send('Unexpected error during password reset. Please try again later.');
+    const wasPasswordReset = await userService.update('passwordReset', { password: hash }, id);
+    if (!wasPasswordReset) return res.status(500).send('Unexpected error during password reset. Please try again later.');
 
     // Send response
     res.status(200).send('Password reset succeeded.');
@@ -258,12 +238,63 @@ const resetPassword = async (req: Request, res: Response, next: NextFunction) =>
   }
 };
 
+const list = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    // Fetch all users
+    const users = await User.findAll({
+      attributes: { exclude: ['password'] },
+      order: [
+        ['company', 'ASC'],
+        ['fname', 'ASC'],
+        ['lname', 'ASC']
+      ]
+    });
+
+    // Send response
+    res.status(200).json({
+      users
+    });
+  } catch (err) {
+    console.error(`${serverError} Error: ${err}`);
+    res.status(500).send(serverError);
+    next(err);
+  }
+};
+
+const activate = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { params: { id }, user: admin } = req;
+
+    // Get user
+    const user = await User.findByPk(id);
+    if (!user) return res.status(400).send('User doesn\'t exist.');
+
+    // Activate user
+    const wasActivated = userService.update('activation', { active: true }, +id, admin!.id);
+    if (!wasActivated) {
+      return res.status(500).send('Unexpected error during user activation. Please try again later.');
+    }
+
+    // Send activation done email
+    const { accepted, messageId } = await mailer.sendActivationDoneEmail(user.email);
+
+    res.status(200).json({
+      wasEmailSent: ((accepted && accepted[0] === user.email) && !!messageId)
+    });
+  } catch (err) {
+    console.error(`${serverError} Error: ${err}`);
+    res.status(500).send(serverError);
+    next(err);
+  }
+};
+
 export {
-  list,
   register,
   sendVerificationEmail,
   verify,
   sendResetPasswordEmail,
   verifyResetPasswordToken,
-  resetPassword
+  resetPassword,
+  list,
+  activate
 };
