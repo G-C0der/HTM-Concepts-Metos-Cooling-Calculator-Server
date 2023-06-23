@@ -47,7 +47,7 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
     const expiration = moment().add(1, 'day').valueOf();
 
     // Prepare user object for client
-    const { dataValues: { id, password: _, verified, active, ...userData } } = user;
+    const { dataValues: { password: _, verified, active, ...userData } } = user;
 
     // Send response
     res.status(200).json({
