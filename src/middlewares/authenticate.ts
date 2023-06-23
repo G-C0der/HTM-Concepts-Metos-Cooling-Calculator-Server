@@ -24,12 +24,15 @@ const authenticate = async (req: Request, res: Response, next: NextFunction) => 
     // Validate user
     const user = await User.findOne({
       where: { id },
-      attributes: ['active', 'verified', 'admin', 'email', 'fname', 'lname']
+      attributes: ['id', 'active', 'verified', 'admin', 'email', 'fname', 'lname']
     });
     if (!user || !user.verified || !user.active) return res.status(401).send(unauthorizedError);
 
+    // Prepare user object for client and further usage
+    const { dataValues: { verified, active, ...userData } } = user;
+
     // Save user in request
-    req.user = user!;
+    req.user = userData!;
 
     next();
   } catch (err) {
