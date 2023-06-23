@@ -13,9 +13,9 @@ const list = async (req: Request, res: Response, next: NextFunction) => {
     const users = await User.findAll({
       attributes: { exclude: ['password'] },
       order: [
-        ['company', 'DESC'],
-        ['fname', 'DESC'],
-        ['lname', 'DESC']
+        ['company', 'ASC'],
+        ['fname', 'ASC'],
+        ['lname', 'ASC']
       ]
     });
 
