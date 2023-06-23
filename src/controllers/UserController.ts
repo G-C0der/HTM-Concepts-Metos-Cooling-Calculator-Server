@@ -261,22 +261,23 @@ const list = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-const activate = async (req: Request, res: Response, next: NextFunction) => {
+const changeActiveState = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { params: { id }, user: admin } = req;
+    const { params: { id }, user: admin, body: { active } } = req;
 
     // Get user
     const user = await User.findByPk(id);
     if (!user) return res.status(400).send('User doesn\'t exist.');
 
-    // Activate user
-    const wasActivated = userService.update('activation', { active: true }, +id, admin!.id);
-    if (!wasActivated) {
-      return res.status(500).send('Unexpected error during user activation. Please try again later.');
+    // Change user active state
+    const wasActiveStateChanged = userService.update('activation', { active }, +id, admin!.id);
+    if (!wasActiveStateChanged) {
+      return res.status(500).send('Unexpected error during user active state change. Please try again later.');
     }
 
-    // Send activation done email
-    const { accepted, messageId } = await mailer.sendActivationDoneEmail(user.email);
+    // Send activation done email if user was activated
+    let accepted, messageId;
+    if (active) ({ accepted, messageId } = await mailer.sendActivationDoneEmail(user.email));
 
     res.status(200).json({
       wasEmailSent: ((accepted && accepted[0] === user.email) && !!messageId)
@@ -296,5 +297,5 @@ export {
   verifyResetPasswordToken,
   resetPassword,
   list,
-  activate
+  changeActiveState
 };
