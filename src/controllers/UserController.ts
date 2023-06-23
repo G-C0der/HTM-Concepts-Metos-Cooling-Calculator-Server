@@ -270,7 +270,12 @@ const changeActiveState = async (req: Request, res: Response, next: NextFunction
     if (!user) return res.status(400).send('User doesn\'t exist.');
 
     // Change user active state
-    const wasActiveStateChanged = userService.update('activation', { active }, +id, admin!.id);
+    const wasActiveStateChanged = userService.update(
+      active ? 'activation' : 'deactivation',
+      { active },
+      +id,
+      admin!.id
+    );
     if (!wasActiveStateChanged) {
       return res.status(500).send('Unexpected error during user active state change. Please try again later.');
     }
