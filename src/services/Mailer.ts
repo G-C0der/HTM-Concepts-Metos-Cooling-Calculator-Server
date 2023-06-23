@@ -1,5 +1,5 @@
 import nodemailer from 'nodemailer';
-import { smtpExchangeHost, smtpExchangePort, smtpExchangeEmail, smtpExchangePassword } from '../config';
+import {smtpExchangeHost, smtpExchangePort, smtpExchangeEmail, smtpExchangePassword, clientBaseUrl} from '../config';
 import ejs from 'ejs';
 import path from 'path';
 import { escape } from 'lodash';
@@ -100,7 +100,8 @@ class Mailer {
     return await this.sendEmail(
       userEmail,
       'Cooling Calculator - Your User Account is Now Active',
-      templatePath
+      templatePath,
+      { coolingCalculatorUrl: clientBaseUrl }
     );
   };
 }
