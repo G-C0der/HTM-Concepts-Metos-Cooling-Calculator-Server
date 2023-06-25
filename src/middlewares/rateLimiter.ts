@@ -28,17 +28,17 @@ const endpointLimits = [
 let redisClient: any, endpointRateLimiters: any;
 (async () => {
   // Connect to redis client if on prod env
-  if (isProdEnv) {
-    redisClient = createClient({
-      url: redisUrl
-    });
-
-    redisClient.on('error', (err: any) => {
-      console.error('Error occurred with Redis client: ', err);
-    });
-
-    await redisClient.connect();
-  }
+  // if (isProdEnv) {
+  //   redisClient = createClient({
+  //     url: redisUrl
+  //   });
+  //
+  //   redisClient.on('error', (err: any) => {
+  //     console.error('Error occurred with Redis client: ', err);
+  //   });
+  //
+  //   await redisClient.connect();
+  // }
 
   // Set up rate limiters for each endpoint specified in endpointLimits
   endpointRateLimiters = endpointLimits.reduce((acc, { endpoint, max, keyword }) =>
@@ -48,12 +48,12 @@ let redisClient: any, endpointRateLimiters: any;
       standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
       legacyHeaders: false, // Disable the `X-RateLimit-*` headers
       message: `Too many ${keyword} requests created, please try again in 10 minutes.`,
-      keyGenerator: () => endpoint,
-      ...(isProdEnv && {
-        store: new RedisStore({
-          sendCommand: (...args: string[]) => redisClient.sendCommand(args)
-        })
-      })
+      // keyGenerator: () => endpoint,
+      // ...(isProdEnv && {
+      //   store: new RedisStore({
+      //     sendCommand: (...args: string[]) => redisClient.sendCommand(args)
+      //   })
+      // })
     })}), {});
 })();
 
