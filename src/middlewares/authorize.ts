@@ -5,10 +5,7 @@ const authorize = (req: Request, res: Response, next: NextFunction) => {
   try {
     if (!req.user) throw new Error('Authorize middleware needs to be called after authenticate middleware.');
 
-    if (!req.user.admin) {
-      console.error('No permission error. User:', req.user, `Req:`, req);
-      return res.status(400).send('No permission.');
-    }
+    if (!req.user.admin) return res.status(400).send('No permission.');
 
     next();
   } catch (err) {
