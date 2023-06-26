@@ -1,4 +1,4 @@
-import nodemailer from 'nodemailer';
+import nodemailer, {SentMessageInfo} from 'nodemailer';
 import {smtpExchangeHost, smtpExchangePort, smtpExchangeEmail, smtpExchangePassword, clientBaseUrl} from '../config';
 import ejs from 'ejs';
 import path from 'path';
@@ -56,53 +56,61 @@ class Mailer {
     }
   };
 
+  private wasEmailSent = (response: SentMessageInfo, recipientEmail: string) =>
+    !!((response.accepted && response.accepted[0] === recipientEmail) && response.messageId);
+
   sendVerificationPendingEmail = async (userEmail: string, verificationUrl: string) => {
     const templatePath = path.join(__dirname, '../templates/verificationPendingEmail.ejs');
-    return await this.sendEmail(
+    const response = await this.sendEmail(
       userEmail,
       'Cooling Calculator - Verify Your User Account',
       templatePath,
       { verificationUrl }
     );
+    return this.wasEmailSent(response, userEmail);
   };
 
   sendVerificationDoneEmail = async (htmConceptsEmail: string, userEmail: string) => {
     const templatePath = path.join(__dirname, '../templates/verificationDoneEmail.ejs');
-    return await this.sendEmail(
+    const response = await this.sendEmail(
       htmConceptsEmail,
       'Cooling Calculator - A User Account Is Ready for Activation',
       templatePath,
       { userEmail: escape(userEmail) }
     );
+    return this.wasEmailSent(response, htmConceptsEmail);
   };
   
   sendActivationPendingEmail =  async (userEmail: string) => {
     const templatePath = path.join(__dirname, '../templates/activationPendingEmail.ejs');
-    return await this.sendEmail(
+    const response = await this.sendEmail(
       userEmail,
       'Cooling Calculator - Your User Account Is Awaiting Activation',
       templatePath
     );
+    return this.wasEmailSent(response, userEmail);
   };
 
   sendPasswordResetPendingEmail = async (userEmail: string, passwordResetUrl: string) => {
     const templatePath = path.join(__dirname, '../templates/passwordResetPendingEmail.ejs');
-    return await this.sendEmail(
+    const response = await this.sendEmail(
       userEmail,
       'Cooling Calculator - Reset Your User Account Password',
       templatePath,
       { passwordResetUrl }
     );
+    return this.wasEmailSent(response, userEmail);
   };
 
   sendActivationDoneEmail = async (userEmail: string) => {
     const templatePath = path.join(__dirname, '../templates/activationDoneEmail.ejs');
-    return await this.sendEmail(
+    const response = await this.sendEmail(
       userEmail,
       'Cooling Calculator - Your User Account is Now Active',
       templatePath,
       { coolingCalculatorUrl: clientBaseUrl }
     );
+    return this.wasEmailSent(response, userEmail);
   };
 }
 

@@ -55,11 +55,11 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
     );
 
     // Send verification pending email
-    const { accepted, messageId } = await mailer.sendVerificationPendingEmail(email, verificationUrl);
+    const wasEmailSent = await mailer.sendVerificationPendingEmail(email, verificationUrl);
 
     // Send response
     res.status(200).json({
-      wasEmailSent: ((accepted && accepted[0] === email) && !!messageId)
+      wasEmailSent
     });
   } catch (err) {
     console.error(`${serverError} Error: ${err}`);
@@ -92,11 +92,11 @@ const sendVerificationEmail = async (req: Request, res: Response, next: NextFunc
     );
 
     // Send verification pending email
-    const { accepted, messageId } = await mailer.sendVerificationPendingEmail(email, verificationUrl);
+    const wasEmailSent = await mailer.sendVerificationPendingEmail(email, verificationUrl);
 
     // Send response
     res.status(200).json({
-      wasEmailSent: ((accepted && accepted[0] === email) && !!messageId)
+      wasEmailSent
     });
   } catch (err) {
     console.error(`${serverError} Error: ${err}`);
@@ -165,11 +165,11 @@ const sendResetPasswordEmail = async (req: Request, res: Response, next: NextFun
     );
 
     // Send reset password pending email
-    const { accepted, messageId } = await mailer.sendPasswordResetPendingEmail(email, passwordResetUrl);
+    const wasEmailSent = await mailer.sendPasswordResetPendingEmail(email, passwordResetUrl);
 
     // Send response
     res.status(200).json({
-      wasEmailSent: ((accepted && accepted[0] === email) && !!messageId)
+      wasEmailSent
     });
   } catch (err) {
     console.error(`${serverError} Error: ${err}`);
@@ -281,11 +281,11 @@ const changeActiveState = async (req: Request, res: Response, next: NextFunction
     }
 
     // Send activation done email if user was activated
-    let accepted, messageId;
-    if (active) ({ accepted, messageId } = await mailer.sendActivationDoneEmail(user.email));
+    let wasEmailSent;
+    if (active) wasEmailSent = await mailer.sendActivationDoneEmail(user.email);
 
     res.status(200).json({
-      wasEmailSent: ((accepted && accepted[0] === user.email) && !!messageId)
+      wasEmailSent
     });
   } catch (err) {
     console.error(`${serverError} Error: ${err}`);
