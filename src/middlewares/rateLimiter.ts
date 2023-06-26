@@ -47,7 +47,7 @@ let redisClient: any, endpointRateLimiters: any;
       max, // Limit each IP to n requests per windowMs
       standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
       legacyHeaders: false, // Disable the `X-RateLimit-*` headers
-      message: `Too many ${keyword} requests created, please try again in ${isProdEnv ? 3 : 10} minutes.`, // Heroku dynos change every few minutes, resetting the limiter each time
+      message: `Too many ${keyword} requests created, please try again in ${isProdEnv ? 5 : 10} minutes.`, // Heroku dynos change every few minutes, resetting the limiter each time
       // keyGenerator: () => endpoint, // TODO: For this to work correctly on Heroku, an ID saved in a cookie needs to be added to the key so the user can be identified
       // ...(isProdEnv && {
       //   store: new RedisStore({
