@@ -5,7 +5,12 @@ import * as yup from 'yup';
 import {mailer, userService} from "../services";
 import validator from 'validator';
 import {htmConceptsEmail, passwordResetSecret, verificationSecret} from "../config";
-import {serverError, emailValidationSchema, passwordValidationSchema} from "../constants";
+import {
+  serverError,
+  emailValidationSchema,
+  passwordValidationSchema,
+  userAlreadyVerifiedError
+} from "../constants";
 import {VerificationError} from "../errors";
 
 const register = async (req: Request, res: Response, next: NextFunction) => {
@@ -81,7 +86,10 @@ const sendVerificationEmail = async (req: Request, res: Response, next: NextFunc
       attributes: ['id', 'verified']
     });
     if (!user) return res.status(400).send('A user with the specified email doesn\'t exist.');
-    if (user.verified) return res.status(400).send('User Account has already been verified.');
+    if (user.verified) return res.status(400).json({
+      message: userAlreadyVerifiedError,
+      severity: 'warning'
+    });
 
     // Create verification URL
     const verificationUrl = userService.generateVerificationUrl(
@@ -119,7 +127,10 @@ const verify = async (req: Request, res: Response, next: NextFunction) => {
     }
 
     // Check if user already verified
-    if (user!.verified) return res.status(400).send('User Account has already been verified.');
+    if (user!.verified) return res.status(400).json({
+      message: userAlreadyVerifiedError,
+      severity: 'warning'
+    });
 
     // Set user verified
     const wasVerified = await userService.update('verification', { verified: true }, user.id);
