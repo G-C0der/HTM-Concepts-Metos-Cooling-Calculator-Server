@@ -19,7 +19,7 @@ AuditLog.init({
     type: new DataTypes.STRING(30),
     allowNull: false
   },
-  operator: {
+  operatorId: {
     type: DataTypes.INTEGER.UNSIGNED,
     allowNull: false,
     references: {
@@ -27,7 +27,7 @@ AuditLog.init({
       key: 'id'
     }
   },
-  user: {
+  userId: {
     type: DataTypes.INTEGER.UNSIGNED,
     allowNull: false,
     references: {

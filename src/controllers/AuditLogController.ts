@@ -1,11 +1,23 @@
 import {NextFunction, Request, Response} from "express";
 import {serverError} from "../constants";
-import {AuditLog} from "../models";
+import {AuditLog, User} from "../models";
 
 const list = async (req: Request, res: Response, next: NextFunction) => {
   try {
     // Fetch all audit logs
     const auditLogs = await AuditLog.findAll({
+      include: [
+        {
+          model: User,
+          as: 'operator',
+          attributes: ['email']
+        },
+        {
+          model: User,
+          as: 'user',
+          attributes: ['email']
+        }
+      ],
       order: ['created_at', 'DESC']
     });
 
