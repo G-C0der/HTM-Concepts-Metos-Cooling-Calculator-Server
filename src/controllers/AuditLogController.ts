@@ -18,7 +18,7 @@ const list = async (req: Request, res: Response, next: NextFunction) => {
           attributes: ['email']
         }
       ],
-      order: ['created_at', 'DESC']
+      order: [['createdAt', 'DESC']]
     });
 
     // Send response
