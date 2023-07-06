@@ -33,3 +33,23 @@ export {
   User,
   AuditLog
 };
+
+module.exports = {
+  development: {
+    username: databaseUsername,
+    password: databasePassword,
+    database: databaseName,
+    host: databaseHost,
+    dialect: 'mysql'
+  },
+  production: {
+    use_env_variable: isProdEnv ? jawsDbMariaUrl : undefined,
+    dialect: 'mysql',
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false,
+      },
+    },
+  }
+};
