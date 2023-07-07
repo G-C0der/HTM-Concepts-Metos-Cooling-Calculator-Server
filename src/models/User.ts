@@ -1,6 +1,6 @@
 import { DataTypes, Model } from 'sequelize';
 import {sequelize} from './';
-import {userFieldLengths} from "../constants/user";
+import {userFieldLengths} from "../constants";
 
 class User extends Model {
   public id!: number;

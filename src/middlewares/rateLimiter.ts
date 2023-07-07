@@ -23,6 +23,7 @@ const endpointLimits = [
   { endpoint: 'PATCH:/users/password-reset/:token', max: 3, keyword: 'password reset' },
   { endpoint: 'GET:/users', max: 10, keyword: 'user list' },
   { endpoint: 'PATCH:/users/:id', max: 3, keyword: 'active state change' },
+  { endpoint: 'GET:/audit-log', max: 10, keyword: 'audit log' },
 ];
 
 let redisClient: any, endpointRateLimiters: any;

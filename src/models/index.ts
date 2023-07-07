@@ -21,6 +21,25 @@ const sequelize = isProdEnv
       }
     );
 
+const development = {
+  username: databaseUsername,
+  password: databasePassword,
+  database: databaseName,
+  host: databaseHost,
+  dialect: 'mysql'
+};
+
+const production = {
+  use_env_variable: isProdEnv ? jawsDbMariaUrl : undefined,
+  dialect: 'mysql',
+  dialectOptions: {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false,
+    }
+  }
+};
+
 // Models initialization
 import { User } from './User';
 import { AuditLog } from './AuditLog';
@@ -29,7 +48,14 @@ import { AuditLog } from './AuditLog';
 import './relations';
 
 export {
+  // Sequelize instance
   sequelize,
+
+  // Sequelize CLI config
+  development,
+  production,
+
+  // Models
   User,
   AuditLog
 };
