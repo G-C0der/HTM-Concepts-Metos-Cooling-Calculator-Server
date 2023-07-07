@@ -30,7 +30,7 @@ const development = {
 };
 
 const production = {
-  use_env_variable: jawsDbMariaUrl,
+  use_env_variable: 'JAWSDB_MARIA_URL',
   dialect: 'mysql',
   dialectOptions: {
     ssl: {
