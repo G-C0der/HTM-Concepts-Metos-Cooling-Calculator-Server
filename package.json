@@ -1,6 +1,6 @@
 {
   "name": "htmconceptsmetoscoolingcalculator-server",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "scripts": {
     "dev": "nodemon --exec ts-node src/index.ts",
     "build": "tsc && cp -r src/templates/ dist/",
