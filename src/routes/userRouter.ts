@@ -17,8 +17,8 @@ userRouter.post('/users/verification', rateLimiter, sendVerificationEmail);
 userRouter.patch('/users/verification/:token', rateLimiter, verify);
 userRouter.post('/users/password-reset', rateLimiter, sendResetPasswordEmail);
 userRouter.get('/users/password-reset/:token', rateLimiter, verifyResetPasswordToken);
-userRouter.patch('/users/password-reset/:token', rateLimiter, resetPassword);
-userRouter.get('/users', rateLimiter, authenticate, authorize, list);
-userRouter.patch('/users/:id', rateLimiter, authenticate, authorize, changeActiveState);
+userRouter.patch('/users/password-reset/:token', rateLimiter, authenticate(false), resetPassword);
+userRouter.get('/users', rateLimiter, authenticate(), authorize, list);
+userRouter.patch('/users/:id', rateLimiter, authenticate(), authorize, changeActiveState);
 
 export default userRouter;
