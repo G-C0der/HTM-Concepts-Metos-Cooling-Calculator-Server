@@ -8,17 +8,17 @@ import {
   verify,
   verifyResetPasswordToken
 } from "../controllers/UserController";
-import {authenticate, authorize, rateLimiter} from "../middlewares";
+import {rateLimitedAdminMiddlewares, rateLimitedMiddlewares, rateLimitedOptionalAuthMiddlewares} from "../middlewares";
 
 const userRouter = Router();
 
-userRouter.post('/users', rateLimiter, register);
-userRouter.post('/users/verification', rateLimiter, sendVerificationEmail);
-userRouter.patch('/users/verification/:token', rateLimiter, verify);
-userRouter.post('/users/password-reset', rateLimiter, sendResetPasswordEmail);
-userRouter.get('/users/password-reset/:token', rateLimiter, verifyResetPasswordToken);
-userRouter.patch('/users/password-reset/:token', rateLimiter, authenticate(false), resetPassword);
-userRouter.get('/users', rateLimiter, authenticate(), authorize, list);
-userRouter.patch('/users/:id', rateLimiter, authenticate(), authorize, changeActiveState);
+userRouter.post('/users', rateLimitedMiddlewares, register);
+userRouter.post('/users/verification', rateLimitedMiddlewares, sendVerificationEmail);
+userRouter.patch('/users/verification/:token', rateLimitedMiddlewares, verify);
+userRouter.post('/users/password-reset', rateLimitedMiddlewares, sendResetPasswordEmail);
+userRouter.get('/users/password-reset/:token', rateLimitedMiddlewares, verifyResetPasswordToken);
+userRouter.patch('/users/password-reset/:token', rateLimitedOptionalAuthMiddlewares, resetPassword);
+userRouter.get('/users', rateLimitedAdminMiddlewares, list);
+userRouter.patch('/users/:id', rateLimitedAdminMiddlewares, changeActiveState);
 
 export default userRouter;
