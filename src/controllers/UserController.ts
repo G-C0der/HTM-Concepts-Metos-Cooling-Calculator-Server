@@ -253,6 +253,19 @@ const resetPassword = async (req: Request, res: Response, next: NextFunction) =>
   }
 };
 
+const editProfile = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { params: { id }, body: userFields, user } = req;
+
+    const wasProfileEdited =
+      await userService.update('profileEdit', userFields, +id ?? user!.id, user!.id);
+  } catch (err) {
+    console.error(`${serverError} Error: ${err}`);
+    res.status(500).send(serverError);
+    next(err);
+  }
+};
+
 const list = async (req: Request, res: Response, next: NextFunction) => {
   try {
     // Fetch all users
@@ -316,6 +329,7 @@ export {
   sendResetPasswordEmail,
   verifyResetPasswordToken,
   resetPassword,
+  editProfile,
   list,
   changeActiveState
 };
