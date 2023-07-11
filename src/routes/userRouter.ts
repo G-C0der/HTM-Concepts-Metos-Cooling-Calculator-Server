@@ -26,6 +26,6 @@ userRouter.patch('/users/password-reset/:token', rateLimitedOptionalAuthMiddlewa
 userRouter.patch('/users', rateLimitedAuthMiddlewares, editProfile);
 userRouter.patch('/users/:id', rateLimitedAdminMiddlewares, editProfile);
 userRouter.get('/users', rateLimitedAdminMiddlewares, list);
-userRouter.patch('/users/:id', rateLimitedAdminMiddlewares, changeActiveState);
+userRouter.patch('/users/:id/state-change', rateLimitedAdminMiddlewares, changeActiveState);
 
 export default userRouter;

@@ -24,7 +24,7 @@ const endpointLimits = [
   { endpoint: 'PATCH:/users', max: 3, keyword: 'profile edit' },
   { endpoint: 'PATCH:/users/:id', max: 3, keyword: 'profile edit' },
   { endpoint: 'GET:/users', max: 10, keyword: 'user list' },
-  { endpoint: 'PATCH:/users/:id', max: 3, keyword: 'active state change' },
+  { endpoint: 'PATCH:/users/:id/state-change', max: 3, keyword: 'active state change' },
   { endpoint: 'GET:/audit-log', max: 10, keyword: 'audit log' },
 ];
 
