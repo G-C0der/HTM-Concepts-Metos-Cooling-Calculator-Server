@@ -212,15 +212,19 @@ const verifyResetPasswordToken = async (req: Request, res: Response, next: NextF
 
 const resetPassword = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { params: { token }, body: { password } } = req;
+    const { params: { token }, body: { password }, user } = req;
 
     // Validate token
+    // Either user has already been authenticated or password reset token is required
     let id;
-    try {
-      ({ id } = await userService.verifyToken(token, passwordResetSecret, 'passwordReset'));
-    } catch (err: any) {
-      if (err instanceof VerificationError) return res.status(err.code).send(err.message);
-      throw err;
+    if (user) ({ id } = user);
+    else {
+      try {
+        ({ id } = await userService.verifyToken(token, passwordResetSecret, 'passwordReset'));
+      } catch (err: any) {
+        if (err instanceof VerificationError) return res.status(err.code).send(err.message);
+        throw err;
+      }
     }
 
     // Validate password
