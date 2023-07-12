@@ -9,7 +9,7 @@ import {
   serverError,
   emailValidationSchema,
   passwordValidationSchema,
-  userAlreadyVerifiedError
+  userAlreadyVerifiedError, editableUserFields
 } from "../constants";
 import {VerificationError} from "../errors";
 import {toEditableUserFields} from "../utils";
@@ -254,6 +254,27 @@ const resetPassword = async (req: Request, res: Response, next: NextFunction) =>
   }
 };
 
+const fetchForm = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { user } = req;
+
+    // Get user form fields
+    const form = await User.findByPk(user!.id, {
+      attributes: editableUserFields
+    });
+    if (!form) return res.status(500).send('Unexpected error during profile data loading. Please try again later.');
+
+    // Send response
+    res.status(200).json({
+      form
+    });
+  } catch (err) {
+    console.error(`${serverError} Error: ${err}`);
+    res.status(500).send(serverError);
+    next(err);
+  }
+}
+
 const editProfile = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { params: { id }, body: userFields, user } = req;
@@ -335,6 +356,7 @@ export {
   sendResetPasswordEmail,
   verifyResetPasswordToken,
   resetPassword,
+  fetchForm,
   editProfile,
   list,
   changeActiveState

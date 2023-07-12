@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import {
-  changeActiveState, editProfile,
+  changeActiveState, editProfile, fetchForm,
   list,
   register, resetPassword,
   sendResetPasswordEmail,
@@ -23,6 +23,7 @@ userRouter.post('/users/password-reset', rateLimiter, sendResetPasswordEmail);
 userRouter.get('/users/password-reset/:token', rateLimiter, verifyResetPasswordToken);
 userRouter.patch('/users/password-reset/:token', rateLimiter, resetPassword);
 userRouter.patch('/users/password-reset', rateLimiter, authenticate, resetPassword);
+userRouter.get('/users/form', rateLimiter, authenticate, fetchForm);
 userRouter.patch('/users', rateLimiter, authenticate, editProfile);
 userRouter.patch('/users/:id', rateLimiter, authenticate, authorize, editProfile);
 userRouter.get('/users', rateLimiter, authenticate, authorize, list);
