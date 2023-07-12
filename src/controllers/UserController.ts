@@ -12,6 +12,7 @@ import {
   userAlreadyVerifiedError
 } from "../constants";
 import {VerificationError} from "../errors";
+import {toEditableUserFields} from "../utils/user";
 
 const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -48,7 +49,7 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
     const newUser = await userService.create('registration', {
       email,
       password: hash,
-      ...otherFields
+      ...toEditableUserFields(otherFields)
     });
 
     // Create verification URL
@@ -257,8 +258,13 @@ const editProfile = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { params: { id }, body: userFields, user } = req;
 
-    const wasProfileEdited =
-      await userService.update('profileEdit', userFields, +id ?? user!.id, user!.id);
+    // Update profile
+    const wasProfileEdited = await userService.update('profileEdit', toEditableUserFields(userFields),
+      +id ?? user!.id, user!.id);
+    if (!wasProfileEdited) return res.status(500).send('Unexpected error during profile edit. Please try again later.');
+
+    // Send response
+    res.status(200).send('Profile edit succeeded');
   } catch (err) {
     console.error(`${serverError} Error: ${err}`);
     res.status(500).send(serverError);
