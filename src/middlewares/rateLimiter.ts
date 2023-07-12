@@ -21,6 +21,7 @@ const endpointLimits = [
   { endpoint: 'POST:/users/password-reset', max: 3, keyword: 'password reset email' },
   { endpoint: 'GET:/users/password-reset/:token', max: 3, keyword: 'password reset' },
   { endpoint: 'PATCH:/users/password-reset/:token', max: 3, keyword: 'password reset' },
+  { endpoint: 'PATCH:/users/password-reset', max: 3, keyword: 'password reset' },
   { endpoint: 'PATCH:/users', max: 3, keyword: 'profile edit' },
   { endpoint: 'PATCH:/users/:id', max: 3, keyword: 'profile edit' },
   { endpoint: 'GET:/users', max: 10, keyword: 'user list' },

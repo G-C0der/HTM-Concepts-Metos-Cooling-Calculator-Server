@@ -21,10 +21,11 @@ userRouter.post('/users/verification', rateLimiter, sendVerificationEmail);
 userRouter.patch('/users/verification/:token', rateLimiter, verify);
 userRouter.post('/users/password-reset', rateLimiter, sendResetPasswordEmail);
 userRouter.get('/users/password-reset/:token', rateLimiter, verifyResetPasswordToken);
-userRouter.patch('/users/password-reset/:token', rateLimiter, authenticate(false), resetPassword);
+userRouter.patch('/users/password-reset/:token', rateLimiter, resetPassword);
+userRouter.patch('/users/password-reset', rateLimiter, authenticate, resetPassword);
 userRouter.patch('/users', rateLimiter, authenticate, editProfile);
 userRouter.patch('/users/:id', rateLimiter, authenticate, authorize, editProfile);
-userRouter.get('/users', rateLimiter, authenticate(), authorize, list);
-userRouter.patch('/users/:id', rateLimiter, authenticate(), authorize, changeActiveState);
+userRouter.get('/users', rateLimiter, authenticate, authorize, list);
+userRouter.patch('/users/:id', rateLimiter, authenticate, authorize, changeActiveState);
 
 export default userRouter;

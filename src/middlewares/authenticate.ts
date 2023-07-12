@@ -5,47 +5,41 @@ import {User} from "../models";
 import {serverError, unauthorizedError} from "../constants";
 import {ServerError} from "../errors";
 
-const authenticate = (authenticationRequired: boolean = true) => {
-  const unauthorizedAction = (res: Response, next: NextFunction) => authenticationRequired
-    ? res.status(401).send(unauthorizedError)
-    : next();
+const authenticate = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    // Get token
+    let token = req.headers.authorization;
+    if (token) token = token.substring('Bearer '.length);
+    if (!token) return res.status(401).send(unauthorizedError);
 
-  return async (req: Request, res: Response, next: NextFunction) => {
+    // Validate token
+    if (!authSecret) throw new ServerError('Error verifying user. Secret not provided.');
+    let id;
     try {
-      // Get token
-      let token = req.headers.authorization;
-      if (token) token = token.substring('Bearer '.length);
-      if (!token) return unauthorizedAction(res, next);
-
-      // Validate token
-      if (!authSecret) throw new ServerError('Error verifying user. Secret not provided.');
-      let id;
-      try {
-        ({ id } = jwt.verify(token!, authSecret) as jwt.JwtPayload);
-      } catch (err) {
-        return unauthorizedAction(res, next);
-      }
-
-      // Validate user
-      const user = await User.findOne({
-        where: { id },
-        attributes: ['id', 'active', 'verified', 'admin', 'email', 'fname', 'lname']
-      });
-      if (!user || !user.verified || !user.active) return unauthorizedAction(res, next);
-
-      // Prepare user object for client and further usage
-      const { dataValues: { verified, active, ...userData } } = user;
-
-      // Save user in request
-      req.user = userData!;
-
-      next();
+      ({ id } = jwt.verify(token!, authSecret) as jwt.JwtPayload);
     } catch (err) {
-      console.error(`${serverError} Error: ${err}`);
-      res.status(500).send(serverError);
-      next(err);
+      return res.status(401).send(unauthorizedError);
     }
-  };
+
+    // Validate user
+    const user = await User.findOne({
+      where: { id },
+      attributes: ['id', 'active', 'verified', 'admin', 'email', 'fname', 'lname']
+    });
+    if (!user || !user.verified || !user.active) return res.status(401).send(unauthorizedError);
+
+    // Prepare user object for client and further usage
+    const { dataValues: { verified, active, ...userData } } = user;
+
+    // Save user in request
+    req.user = userData!;
+
+    next();
+  } catch (err) {
+    console.error(`${serverError} Error: ${err}`);
+    res.status(500).send(serverError);
+    next(err);
+  }
 };
 
 export {

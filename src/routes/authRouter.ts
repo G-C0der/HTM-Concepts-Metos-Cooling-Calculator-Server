@@ -5,6 +5,6 @@ import {authenticate, rateLimiter} from "../middlewares";
 const authRouter = Router();
 
 authRouter.post('/auth', rateLimiter, login);
-authRouter.get('/auth', authenticate(), getAuthenticatedUser);
+authRouter.get('/auth', authenticate, getAuthenticatedUser);
 
 export default authRouter;
