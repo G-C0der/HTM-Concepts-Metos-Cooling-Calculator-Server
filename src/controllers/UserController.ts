@@ -12,7 +12,7 @@ import {
   userAlreadyVerifiedError
 } from "../constants";
 import {VerificationError} from "../errors";
-import {toEditableUserFields} from "../utils/user";
+import {toEditableUserFields} from "../utils";
 
 const register = async (req: Request, res: Response, next: NextFunction) => {
   try {

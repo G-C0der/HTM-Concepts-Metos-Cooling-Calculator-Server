@@ -1,10 +1,10 @@
 import { Router } from 'express';
 import { login, getAuthenticatedUser } from "../controllers/AuthController";
-import {authMiddlewares, rateLimitedMiddlewares} from "../middlewares";
+import {authenticate, rateLimiter} from "../middlewares";
 
 const authRouter = Router();
 
-authRouter.post('/auth', rateLimitedMiddlewares, login);
-authRouter.get('/auth', authMiddlewares, getAuthenticatedUser);
+authRouter.post('/auth', rateLimiter, login);
+authRouter.get('/auth', authenticate(), getAuthenticatedUser);
 
 export default authRouter;
