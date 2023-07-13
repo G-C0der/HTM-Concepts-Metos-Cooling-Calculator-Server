@@ -27,6 +27,6 @@ userRouter.get('/users/form', authenticate, fetchForm);
 userRouter.patch('/users', rateLimiter, authenticate, editProfile);
 userRouter.patch('/users/:id', rateLimiter, authenticate, authorize, editProfile);
 userRouter.get('/users', rateLimiter, authenticate, authorize, list);
-userRouter.patch('/users/:id', rateLimiter, authenticate, authorize, changeActiveState);
+userRouter.patch('/users/:id/state-change', rateLimiter, authenticate, authorize, changeActiveState);
 
 export default userRouter;
