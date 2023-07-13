@@ -280,8 +280,9 @@ const editProfile = async (req: Request, res: Response, next: NextFunction) => {
     const { params: { id }, body: userFields, user } = req;
 
     // Update profile
+    const userId = id ? +id : user!.id;
     const wasProfileEdited = await userService.update('profileEdit', toEditableUserFields(userFields),
-      +id ?? user!.id, user!.id);
+      userId, user!.id);
     if (!wasProfileEdited) return res.status(500).send('Unexpected error during profile edit. Please try again later.');
 
     // Send response
