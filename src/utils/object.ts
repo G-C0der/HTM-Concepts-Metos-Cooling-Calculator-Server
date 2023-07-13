@@ -1,17 +1,22 @@
 /**
- * Return a new object that contains the reference objects properties which also exist on the comparison object
- * @param referenceObject
- * @param comparisonObject
+ * Return two new objects that contain the properties that have different values
+ * @param oldData
+ * @param newData
  */
-const intersectProperties = <T extends object>(
-  referenceObject: T,
-  comparisonObject: Partial<T>
-): Partial<T> => Object.keys(referenceObject).reduce((acc, key) => {
+
+const getChangedProperties = <T extends object>(
+  oldData: T,
+  newData: T
+): { oldData: Partial<T>, newData: Partial<T> } => Object.keys(oldData).reduce((acc, key) => {
     const keyOfT = key as keyof T;
-    if (keyOfT in comparisonObject) acc[keyOfT] = referenceObject[keyOfT];
+    if (keyOfT in newData && oldData[keyOfT] !== newData[keyOfT]) {
+      acc['oldData'][keyOfT] = oldData[keyOfT];
+      acc['newData'][keyOfT] = newData[keyOfT];
+    }
     return acc;
-  }, {} as Partial<T>);
+  }, { oldData: {}, newData: {} } as { oldData: Partial<T>, newData: Partial<T> }
+);
 
 export {
-  intersectProperties
+  getChangedProperties
 };
