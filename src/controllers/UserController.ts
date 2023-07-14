@@ -16,7 +16,10 @@ import {toEditableUserFields} from "../utils";
 
 const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { email, password, tnc, ...otherFields } = req.body;
+    let { email, password, tnc, ...otherFields } = req.body;
+
+    // Only use allowed user fields
+    otherFields = toEditableUserFields(otherFields);
 
     // Check if Terms and Conditions accepted
     if (!tnc) return res.status(400).send('You must accept the Terms and Conditions.');
@@ -49,7 +52,7 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
     const newUser = await userService.create('registration', {
       email,
       password: hash,
-      ...toEditableUserFields(otherFields)
+      ...otherFields
     });
 
     // Create verification URL
@@ -277,12 +280,14 @@ const fetchForm = async (req: Request, res: Response, next: NextFunction) => {
 
 const editProfile = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { params: { id }, body: userFields, user } = req;
+    let { params: { id }, body: userFields, user } = req;
+
+    // Only use allowed user fields
+    userFields = toEditableUserFields(userFields);
 
     // Update profile
     const userId = id ? +id : user!.id;
-    const wasProfileEdited = await userService.update('profileEdit', toEditableUserFields(userFields),
-      userId, user!.id);
+    const wasProfileEdited = await userService.update('profileEdit', userFields, userId, user!.id);
     if (!wasProfileEdited) return res.status(500).send('Unexpected error during profile edit. Please try again later.');
 
     // Send response
