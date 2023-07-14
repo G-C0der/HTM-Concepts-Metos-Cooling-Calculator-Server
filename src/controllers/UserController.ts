@@ -9,13 +9,17 @@ import {
   serverError,
   emailValidationSchema,
   passwordValidationSchema,
-  userAlreadyVerifiedError
+  userAlreadyVerifiedError, editableUserFields
 } from "../constants";
 import {VerificationError} from "../errors";
+import {toEditableUserFields} from "../utils";
 
 const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { email, password, tnc, ...otherFields } = req.body;
+    let { email, password, tnc, ...otherFields } = req.body;
+
+    // Only use allowed user fields
+    otherFields = toEditableUserFields(otherFields);
 
     // Check if Terms and Conditions accepted
     if (!tnc) return res.status(400).send('You must accept the Terms and Conditions.');
@@ -212,16 +216,20 @@ const verifyResetPasswordToken = async (req: Request, res: Response, next: NextF
 
 const resetPassword = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { params: { token }, body: { password } } = req;
+    const { params: { token }, body: { password }, user } = req;
 
     // Validate token
+    // Either user has already been authenticated or password reset token is required
     let id;
-    try {
-      ({ id } = await userService.verifyToken(token, passwordResetSecret, 'passwordReset'));
-    } catch (err: any) {
-      if (err instanceof VerificationError) return res.status(err.code).send(err.message);
-      throw err;
+    if (token) {
+      try {
+        ({ id } = await userService.verifyToken(token, passwordResetSecret, 'passwordReset'));
+      } catch (err: any) {
+        if (err instanceof VerificationError) return res.status(err.code).send(err.message);
+        throw err;
+      }
     }
+    else ({ id } = user!);
 
     // Validate password
     const validationSchema = yup.object({
@@ -242,6 +250,48 @@ const resetPassword = async (req: Request, res: Response, next: NextFunction) =>
 
     // Send response
     res.status(200).send('Password reset succeeded.');
+  } catch (err) {
+    console.error(`${serverError} Error: ${err}`);
+    res.status(500).send(serverError);
+    next(err);
+  }
+};
+
+const fetchForm = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { user } = req;
+
+    // Get user form fields
+    const form = await User.findByPk(user!.id, {
+      attributes: editableUserFields
+    });
+    if (!form) return res.status(500).send('Unexpected error during profile data loading. Please try again later.');
+
+    // Send response
+    res.status(200).json({
+      form
+    });
+  } catch (err) {
+    console.error(`${serverError} Error: ${err}`);
+    res.status(500).send(serverError);
+    next(err);
+  }
+}
+
+const editProfile = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    let { params: { id }, body: userFields, user } = req;
+
+    // Only use allowed user fields
+    userFields = toEditableUserFields(userFields);
+
+    // Update profile
+    const userId = id ? +id : user!.id;
+    const wasProfileEdited = await userService.update('profileEdit', userFields, userId, user!.id);
+    if (!wasProfileEdited) return res.status(500).send('Unexpected error during profile edit. Please try again later.');
+
+    // Send response
+    res.status(200).send('Profile edit succeeded');
   } catch (err) {
     console.error(`${serverError} Error: ${err}`);
     res.status(500).send(serverError);
@@ -312,6 +362,8 @@ export {
   sendResetPasswordEmail,
   verifyResetPasswordToken,
   resetPassword,
+  fetchForm,
+  editProfile,
   list,
   changeActiveState
 };

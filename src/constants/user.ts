@@ -13,6 +13,10 @@ const userFieldLengths = {
   website: { max: 512 }
 };
 
+const credFields = ['email', 'password'];
+const editableUserFields = Object.keys(userFieldLengths).filter(field => !credFields.includes(field));
+
 export {
-  userFieldLengths
+  userFieldLengths,
+  editableUserFields
 };

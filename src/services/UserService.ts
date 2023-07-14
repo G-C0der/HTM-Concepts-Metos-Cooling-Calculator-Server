@@ -4,7 +4,7 @@ import {User} from "../models";
 import _path from 'path';
 import {ServerError, VerificationError} from "../errors";
 import {Action, auditLogService, CreateAction, UpdateAction} from "./";
-import {intersectProperties} from "../utils";
+import {getChangedProperties} from "../utils";
 import {urlExpiredError, urlInvalidError, urlNoUserAssociatedError} from "../constants";
 
 class UserService {
@@ -82,19 +82,25 @@ class UserService {
     const query = { where: { id: userId } };
     const user = await User.findOne(query);
     if (!user) return false;
+    const { dataValues: { password, ...oldData } } = user;
 
     // Update user
-    const updated = await User.update(updateData, query);
+    for (const [fieldKey, fieldVal] of Object.entries(updateData)) {
+      (user as any)[fieldKey] = fieldVal;
+    }
+    const updatedUser = await user.save();
+
+    // Prepare loggable before and after data
+    const { dataValues: { password: _, ...newData } } = updatedUser;
+    const { oldData: loggableOldData, newData: loggableNewData } = getChangedProperties<Partial<User>>(oldData, newData);
 
     // Log update
-    if(updated) {
-      const { dataValues: { password, ...oldData } } = user;
-      const loggableOldData = intersectProperties(oldData, updateData);
-      const { password: _, ...loggableUpdateData } = updateData;
-      await auditLogService.log(updateActionType, operatorId ?? userId, userId, loggableOldData, loggableUpdateData);
+    const wasUserUpdated = !!Object.keys(loggableNewData).length;
+    if(wasUserUpdated) {
+      await auditLogService.log(updateActionType, operatorId ?? userId, userId, loggableOldData, loggableNewData);
     }
 
-    return updated;
+    return wasUserUpdated;
   };
 }
 
