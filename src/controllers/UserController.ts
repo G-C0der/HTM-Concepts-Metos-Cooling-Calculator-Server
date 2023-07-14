@@ -221,8 +221,7 @@ const resetPassword = async (req: Request, res: Response, next: NextFunction) =>
     // Validate token
     // Either user has already been authenticated or password reset token is required
     let id;
-    if (user) ({ id } = user);
-    else {
+    if (token) {
       try {
         ({ id } = await userService.verifyToken(token, passwordResetSecret, 'passwordReset'));
       } catch (err: any) {
@@ -230,6 +229,7 @@ const resetPassword = async (req: Request, res: Response, next: NextFunction) =>
         throw err;
       }
     }
+    else ({ id } = user!);
 
     // Validate password
     const validationSchema = yup.object({
