@@ -49,7 +49,7 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
 
     // Create token
     if (!authSecret) throw new Error('Error logging in user. Secret not provided.');
-    const token = jwt.sign({ id: user.id }, authSecret, { expiresIn: '1d' });
+    const token = jwt.sign({ id: user.id }, authSecret, { expiresIn: '30d' });
     const expiration = moment().add(30, 'day').valueOf();
 
     // Prepare user object for client
