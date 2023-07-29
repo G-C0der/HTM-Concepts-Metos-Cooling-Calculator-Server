@@ -16,13 +16,10 @@ import {toEditableUserFields} from "../utils";
 
 const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    let { email, password, tnc, ...otherFields } = req.body;
+    let { email, password, ...otherFields } = req.body;
 
     // Only use allowed user fields
     otherFields = toEditableUserFields(otherFields);
-
-    // Check if Terms and Conditions accepted
-    if (!tnc) return res.status(400).send('You must accept the Terms and Conditions.');
 
     // Validate email
     if (!validator.isEmail(email)) return res.status(400).send('Email is invalid.');
