@@ -3,6 +3,11 @@ import {sequelize} from './';
 
 class AuditLog extends Model {
   public id!: number;
+  public action!: string;
+  public operatorId!: number;
+  public userId!: number;
+  public before!: object;
+  public after!: object;
 
   // timestamps
   public readonly createdAt!: Date;
