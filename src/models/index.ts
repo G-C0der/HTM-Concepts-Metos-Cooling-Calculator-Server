@@ -43,6 +43,7 @@ const production = {
 // Models initialization
 import { User } from './User';
 import { AuditLog } from './AuditLog';
+import { CalculatorParams } from './CalculatorParams';
 
 // Relations setup
 import './relations';
@@ -57,5 +58,6 @@ export {
 
   // Models
   User,
-  AuditLog
+  AuditLog,
+  CalculatorParams
 };
