@@ -27,6 +27,7 @@ class CalculatorParams extends Model {
   public kwHourCo2!: number;
   public iceWaterCoolingType1Count!: number;
   public iceWaterCoolingType4Count!: number;
+  public cop!: number;
   public kettles!: Kettle[];
 
   // timestamps
@@ -73,6 +74,10 @@ CalculatorParams.init({
     allowNull: false
   },
   iceWaterCoolingType4Count: {
+    type: new DataTypes.FLOAT,
+    allowNull: false
+  },
+  cop: {
     type: new DataTypes.FLOAT,
     allowNull: false
   },
