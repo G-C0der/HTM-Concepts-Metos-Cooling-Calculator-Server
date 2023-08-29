@@ -29,6 +29,24 @@ const save = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
+const list = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const calculatorParamsList = await CalculatorParams.findAll({
+      where: {
+        userId: req.user!.id
+      },
+      attributes: { exclude: ['userId'] }
+    });
+
+    res.status(200).json(calculatorParamsList);
+  } catch (err) {
+    console.error(`${serverError} Error: ${err}`);
+    res.status(500).send(serverError);
+    next(err);
+  }
+}
+
 export {
-  save
+  save,
+  list
 };
