@@ -288,7 +288,7 @@ const editProfile = async (req: Request, res: Response, next: NextFunction) => {
     if (!wasProfileEdited) return res.status(500).send('Unexpected error during profile edit. Please try again later.');
 
     // Send response
-    res.status(200).send('Profile edit succeeded');
+    res.status(200).send('Profile edit succeeded.');
   } catch (err) {
     console.error(`${serverError} Error: ${err}`);
     res.status(500).send(serverError);

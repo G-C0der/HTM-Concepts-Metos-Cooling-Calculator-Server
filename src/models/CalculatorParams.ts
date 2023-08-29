@@ -126,7 +126,11 @@ CalculatorParams.init({
 },
   {
   sequelize,
-  tableName: 'calculator_params'
+  tableName: 'calculator_params',
+  indexes: [{
+    fields: ['userId', 'name'],
+    unique: true
+  }]
 });
 
 export {
