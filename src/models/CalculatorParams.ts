@@ -138,13 +138,14 @@ CalculatorParams.init({
       fields: ['userId', 'name'],
       unique: true
     },
-    {
-      fields: ['userId', 'inUse'],
-      where: {
-        inUse: true
-      },
-      unique: true
-    }
+    // TODO: Only works with PostgreSQL
+    // {
+    //   fields: ['userId', 'inUse'],
+    //   where: {
+    //     inUse: true
+    //   },
+    //   unique: true
+    // }
   ]
 });
 

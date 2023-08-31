@@ -5,12 +5,7 @@ class CalculatorParamsService {
     const { userId } = params;
 
     // Clear params in use
-    const paramsInUse = await CalculatorParams.findOne({ where: {
-      userId,
-      inUse: true
-    } });
-    if (paramsInUse?.id === params.id) return; // Return if desired params already in use
-    if (paramsInUse) await paramsInUse.update({ inUse: false });
+    await CalculatorParams.update({ inUse: false }, { where: { userId } });
 
     // Set in use
     await params?.update({ inUse: true });
