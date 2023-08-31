@@ -51,9 +51,22 @@ const list = async (req: Request, res: Response, next: NextFunction) => {
     res.status(500).send(serverError);
     next(err);
   }
-}
+};
+
+const remove = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id } = req.params;
+
+    await CalculatorParams.destroy({ where: { id } });
+  } catch (err) {
+    console.error(`${serverError} Error: ${err}`);
+    res.status(500).send(serverError);
+    next(err);
+  }
+};
 
 export {
   save,
-  list
+  list,
+  remove
 };
