@@ -1,4 +1,5 @@
 const editableCalculatorParamsFields = [
+  'name',
   'waterLitreCHF',
   'waterLitreCo2',
   'kwHourCHF',

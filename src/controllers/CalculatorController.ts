@@ -7,12 +7,14 @@ import calculatorParamsService from "../services/CalculatorParamsService";
 const save = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = req.user!.id;
-    const { name } = req.body;
+    const { name, id } = req.body;
 
-    const existingParams = await CalculatorParams.findOne({ where: {
-      userId,
-      name
-    } });
+    const existingParams = id
+      ? await CalculatorParams.findByPk(id)
+      : await CalculatorParams.findOne({ where: {
+        userId,
+        name
+      } });
 
     if (existingParams) {
       await existingParams.update(toEditableCalculatorParamsFields(req.body));
