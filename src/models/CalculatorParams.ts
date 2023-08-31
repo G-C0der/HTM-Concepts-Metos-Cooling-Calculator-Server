@@ -21,6 +21,7 @@ class CalculatorParams extends Model {
   public id!: number;
   public userId!: number;
   public name!: string;
+  public inUse!: boolean;
   public waterLitreCHF!: number;
   public waterLitreCo2!: number;
   public kwHourCHF!: number;
@@ -52,6 +53,11 @@ CalculatorParams.init({
   name: {
     type: new DataTypes.STRING(50),
     allowNull: false
+  },
+  inUse: {
+    type: new DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false
   },
   waterLitreCHF: {
     type: new DataTypes.FLOAT,
@@ -127,10 +133,19 @@ CalculatorParams.init({
   {
   sequelize,
   tableName: 'calculator_params',
-  indexes: [{
-    fields: ['userId', 'name'],
-    unique: true
-  }]
+  indexes: [
+    {
+      fields: ['userId', 'name'],
+      unique: true
+    },
+    {
+      fields: ['userId', 'inUse'],
+      where: {
+        inUse: true
+      },
+      unique: true
+    }
+  ]
 });
 
 export {
