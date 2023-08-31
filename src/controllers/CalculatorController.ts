@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import {serverError} from "../constants";
 import {CalculatorParams} from "../models";
 import {toEditableCalculatorParamsFields} from "../utils";
+import calculatorParamsService from "../services/CalculatorParamsService";
 
 const save = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -15,10 +16,12 @@ const save = async (req: Request, res: Response, next: NextFunction) => {
 
     if (existingParams) {
       await existingParams.update(toEditableCalculatorParamsFields(req.body));
+      await calculatorParamsService.setInUse(existingParams);
 
       return res.status(200).send('Calculator params update succeeded.');
     } else {
-      await CalculatorParams.create({ ...req.body, userId });
+      const params = await CalculatorParams.create({ ...req.body, userId });
+      await calculatorParamsService.setInUse(params);
 
       return res.status(200).send('Calculator params save succeeded.');
     }
