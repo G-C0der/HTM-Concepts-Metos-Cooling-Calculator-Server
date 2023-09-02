@@ -57,13 +57,15 @@ const fetch = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id: userId } = req.user!;
 
-    const params = await CalculatorParams.findOne({ where: {
+    const calculatorParams = await CalculatorParams.findOne({ where: {
       userId,
       inUse: true
     } });
 
+    if (!calculatorParams) return res.status(204).end();
+
     res.status(200).json({
-      params
+      calculatorParams
     });
   } catch (err) {
     console.error(`${serverError} Error: ${err}`);
