@@ -53,6 +53,25 @@ const list = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
+const fetch = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { id: userId } = req.user!;
+
+    const params = await CalculatorParams.findOne({ where: {
+      userId,
+      inUse: true
+    } });
+
+    res.status(200).json({
+      params
+    });
+  } catch (err) {
+    console.error(`${serverError} Error: ${err}`);
+    res.status(500).send(serverError);
+    next(err);
+  }
+}
+
 const remove = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
@@ -68,5 +87,6 @@ const remove = async (req: Request, res: Response, next: NextFunction) => {
 export {
   save,
   list,
+  fetch,
   remove
 };
