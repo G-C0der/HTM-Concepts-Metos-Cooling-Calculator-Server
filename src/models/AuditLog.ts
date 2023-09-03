@@ -6,6 +6,7 @@ class AuditLog extends Model {
   public action!: string;
   public operatorId!: number;
   public userId!: number;
+  public paramsId!: number;
   public before!: object;
   public after!: object;
 
@@ -37,6 +38,13 @@ AuditLog.init({
     allowNull: false,
     references: {
       model: 'users',
+      key: 'id'
+    }
+  },
+  paramsId: {
+    type: DataTypes.INTEGER.UNSIGNED,
+    references: {
+      model: 'calculator_params',
       key: 'id'
     }
   },
