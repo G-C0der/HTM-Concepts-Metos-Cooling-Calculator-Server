@@ -79,8 +79,7 @@ class UserService {
     operatorId?: number
   ) => {
     // Query old data
-    const query = { where: { id: userId } };
-    const user = await User.findOne(query);
+    const user = await User.findByPk(userId);
     if (!user) return false;
     const { dataValues: { password, ...oldData } } = user;
 
