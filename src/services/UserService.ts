@@ -3,7 +3,7 @@ import {clientBaseUrl} from "../config";
 import {User} from "../models";
 import _path from 'path';
 import {ServerError, VerificationError} from "../errors";
-import {Action, auditLogService, CreateAction, UpdateAction} from "./";
+import {UserAction, auditLogService, UserCreateAction, UserUpdateAction} from "./";
 import {getChangedProperties} from "../utils";
 import {urlExpiredError, urlInvalidError, urlNoUserAssociatedError} from "../constants";
 
@@ -22,7 +22,7 @@ class UserService {
   verifyToken = async (
     token: string,
     secret?: string,
-    invalidationAction?: Action,
+    invalidationAction?: UserAction,
     userAttributes: string[] = ['id']
   ): Promise<User> => {
     // Verify token
@@ -59,7 +59,7 @@ class UserService {
   };
 
   create = async (
-    createActionType: CreateAction,
+    createActionType: UserCreateAction,
     createData: Partial<User>,
     operatorId?: number
   ) => {
@@ -73,7 +73,7 @@ class UserService {
   };
 
   update = async (
-    updateActionType: UpdateAction,
+    updateActionType: UserUpdateAction,
     updateData: Partial<User>,
     userId: number,
     operatorId?: number

@@ -1,8 +1,13 @@
 import {AuditLog} from "../models";
 
-type CreateAction = 'registration';
-type UpdateAction = 'verification' | 'passwordReset' | 'profileEdit' | 'activation' | 'deactivation';
-type Action = CreateAction | UpdateAction;
+type UserCreateAction = 'registration';
+type UserUpdateAction = 'verification' | 'passwordReset' | 'profileEdit' | 'activation' | 'deactivation';
+type ParamsCreateAction = 'save';
+type ParamsUpdateAction = 'override';
+type ParamsDeleteAction = 'delete';
+type UserAction = UserCreateAction | UserUpdateAction;
+type ParamsAction = ParamsCreateAction | ParamsUpdateAction | ParamsDeleteAction;
+type Action = UserAction | ParamsAction;
 
 class AuditLogService {
   log = async (
@@ -32,7 +37,12 @@ class AuditLogService {
 export default new AuditLogService();
 
 export type {
-  Action,
-  CreateAction,
-  UpdateAction
+  UserAction,
+  UserCreateAction,
+  UserUpdateAction,
+
+  ParamsAction,
+  ParamsCreateAction,
+  ParamsUpdateAction,
+  ParamsDeleteAction
 };
