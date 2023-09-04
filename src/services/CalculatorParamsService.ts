@@ -46,7 +46,7 @@ class CalculatorParamsService {
     // Log update
     const wasParamsUpdated = !!Object.keys(loggableNewData).length;
     if (wasParamsUpdated) await auditLogService.log(
-      updateActionType, operatorId, operatorId, loggableOldData, loggableNewData, loggableNewData.id
+      updateActionType, operatorId, operatorId, loggableOldData, loggableNewData, newData.id
     );
   };
 
