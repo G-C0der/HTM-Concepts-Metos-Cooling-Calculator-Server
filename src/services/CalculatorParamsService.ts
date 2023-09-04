@@ -16,7 +16,7 @@ class CalculatorParamsService {
     await this.setInUse(newParams);
 
     // Log creation
-    await auditLogService.log(createActionType, operatorId, operatorId, {}, newParams);
+    await auditLogService.log(createActionType, operatorId, operatorId, {}, newParams, newParams.id);
   };
 
   update = async (
@@ -44,9 +44,9 @@ class CalculatorParamsService {
 
     // Log update
     const wasParamsUpdated = !!Object.keys(loggableNewData).length;
-    if (wasParamsUpdated) {
-      await auditLogService.log(updateActionType, operatorId, operatorId, loggableOldData, loggableNewData);
-    }
+    if (wasParamsUpdated) await auditLogService.log(
+      updateActionType, operatorId, operatorId, loggableOldData, loggableNewData, loggableNewData.id
+    );
   };
 
   delete = async (
@@ -63,7 +63,7 @@ class CalculatorParamsService {
     await params.destroy();
 
     // Log deletion
-    await auditLogService.log(deleteActionType, operatorId, operatorId, oldData, {});
+    await auditLogService.log(deleteActionType, operatorId, operatorId, oldData, {}, oldData.id);
   };
 
   setInUse = async (params: CalculatorParams) => {

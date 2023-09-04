@@ -15,11 +15,13 @@ class AuditLogService {
     operatorId: number,
     userId: number,
     before: object,
-    after: object
+    after: object,
+    paramsId?: number
   ) => await AuditLog.create({
     action,
     operatorId,
     userId,
+    paramsId,
     before,
     after
   });
