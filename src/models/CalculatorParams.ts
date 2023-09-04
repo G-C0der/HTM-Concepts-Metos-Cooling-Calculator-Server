@@ -52,7 +52,10 @@ CalculatorParams.init({
   },
   name: {
     type: new DataTypes.STRING(50),
-    allowNull: false
+    allowNull: false,
+    set (value: string) {
+      this.setDataValue('name', value.trim());
+    }
   },
   inUse: {
     type: new DataTypes.BOOLEAN,
