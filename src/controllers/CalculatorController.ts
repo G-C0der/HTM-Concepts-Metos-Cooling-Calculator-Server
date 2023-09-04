@@ -17,13 +17,16 @@ const save = async (req: Request, res: Response, next: NextFunction) => {
       } });
 
     if (existingParams) {
-      await existingParams.update(toEditableCalculatorParamsFields(req.body));
-      await calculatorParamsService.setInUse(existingParams);
+      await calculatorParamsService.update(
+        'override',
+        existingParams,
+        toEditableCalculatorParamsFields(req.body),
+        userId
+      );
 
       return res.status(200).send('Calculator params update succeeded.');
     } else {
-      const params = await CalculatorParams.create({ ...req.body, userId });
-      await calculatorParamsService.setInUse(params);
+      await calculatorParamsService.create('save', { ...req.body, userId }, userId);
 
       return res.status(200).send('Calculator params save succeeded.');
     }
@@ -77,8 +80,11 @@ const fetch = async (req: Request, res: Response, next: NextFunction) => {
 const remove = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
+    const { id: userId } = req.user!;
 
-    await CalculatorParams.destroy({ where: { id } });
+    await calculatorParamsService.delete('delete', +id, userId);
+
+    res.status(200).send('Calculator params deletion succeeded.');
   } catch (err) {
     console.error(`${serverError} Error: ${err}`);
     res.status(500).send(serverError);

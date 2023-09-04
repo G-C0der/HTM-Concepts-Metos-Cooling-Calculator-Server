@@ -39,8 +39,8 @@ class CalculatorParamsService {
 
     // Prepare loggable before and after data
     const { dataValues: newData } = updatedParams;
-    const { oldData: loggableOldData, newData: loggableNewData }
-      = getChangedProperties<Partial<CalculatorParams>>(oldData, newData);
+    const { oldData: loggableOldData, newData: loggableNewData } =
+      getChangedProperties<Partial<CalculatorParams>>(oldData, newData);
 
     // Log update
     const wasParamsUpdated = !!Object.keys(loggableNewData).length;
@@ -66,7 +66,7 @@ class CalculatorParamsService {
     await auditLogService.log(deleteActionType, operatorId, operatorId, oldData, {}, oldData.id);
   };
 
-  setInUse = async (params: CalculatorParams) => {
+  private setInUse = async (params: CalculatorParams) => {
     const { userId } = params;
 
     // Clear params in use
