@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import {serverError} from "../constants";
 import {CalculatorParams} from "../models";
 import {toEditableCalculatorParamsFields} from "../utils";
-import calculatorParamsService from "../services/CalculatorParamsService";
+import {calculatorParamsService} from "../services";
 
 const save = async (req: Request, res: Response, next: NextFunction) => {
   try {
