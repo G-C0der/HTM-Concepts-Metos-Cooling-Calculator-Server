@@ -10,13 +10,14 @@ class CalculatorParamsService {
     operatorId: number
   )=> {
     // Create params
-    const { dataValues: newParams } = await CalculatorParams.create({ ...createData, userId: operatorId });
+    const newParams = await CalculatorParams.create({ ...createData, userId: operatorId });
+    const { dataValues: newData } = newParams;
 
     // Set params in use
     await this.setInUse(newParams);
 
     // Log creation
-    await auditLogService.log(createActionType, operatorId, operatorId, {}, newParams, newParams.id);
+    await auditLogService.log(createActionType, operatorId, operatorId, {}, newData, newData.id);
   };
 
   update = async (
