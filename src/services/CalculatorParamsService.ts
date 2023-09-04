@@ -27,7 +27,7 @@ class CalculatorParamsService {
     operatorId: number
   )=> {
     // Set old data to buffer
-    const { dataValues: oldData } = params;
+    const { dataValues: { ...oldData } } = params;
 
     // Update params
     for (const [fieldKey, fieldVal] of Object.entries(updateData)) {
@@ -58,7 +58,7 @@ class CalculatorParamsService {
     // Query old data
     const params = await CalculatorParams.findByPk(id);
     if (!params) return false;
-    const { dataValues: oldData } = params;
+    const { dataValues: { ...oldData } } = params;
 
     // Delete params
     await params.destroy();
