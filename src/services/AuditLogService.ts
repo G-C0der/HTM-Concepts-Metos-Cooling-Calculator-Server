@@ -2,11 +2,10 @@ import {AuditLog} from "../models";
 
 type UserCreateAction = 'registration';
 type UserUpdateAction = 'verification' | 'passwordReset' | 'profileEdit' | 'activation' | 'deactivation';
-type ParamsCreateAction = 'save';
-type ParamsUpdateAction = 'override';
+type ParamsSaveAction = 'save';
 type ParamsDeleteAction = 'delete';
 type UserAction = UserCreateAction | UserUpdateAction;
-type ParamsAction = ParamsCreateAction | ParamsUpdateAction | ParamsDeleteAction;
+type ParamsAction = ParamsSaveAction | ParamsDeleteAction;
 type Action = UserAction | ParamsAction;
 
 class AuditLogService {
@@ -44,7 +43,6 @@ export type {
   UserUpdateAction,
 
   ParamsAction,
-  ParamsCreateAction,
-  ParamsUpdateAction,
+  ParamsSaveAction,
   ParamsDeleteAction
 };

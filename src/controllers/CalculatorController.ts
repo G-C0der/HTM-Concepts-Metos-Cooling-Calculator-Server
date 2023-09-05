@@ -18,7 +18,7 @@ const save = async (req: Request, res: Response, next: NextFunction) => {
 
     if (existingParams) {
       await calculatorParamsService.update(
-        'override',
+        'save',
         existingParams,
         toEditableCalculatorParamsFields(req.body),
         userId

@@ -1,11 +1,11 @@
 import {CalculatorParams} from "../models";
-import {ParamsCreateAction, ParamsDeleteAction, ParamsUpdateAction} from "./AuditLogService";
+import {ParamsSaveAction, ParamsDeleteAction} from "./AuditLogService";
 import {auditLogService} from "./index";
 import {getChangedProperties} from "../utils";
 
 class CalculatorParamsService {
   create = async (
-    createActionType: ParamsCreateAction,
+    createActionType: ParamsSaveAction,
     createData: Partial<CalculatorParams>,
     operatorId: number
   )=> {
@@ -21,7 +21,7 @@ class CalculatorParamsService {
   };
 
   update = async (
-    updateActionType: ParamsUpdateAction,
+    updateActionType: ParamsSaveAction,
     params: CalculatorParams,
     updateData: Partial<CalculatorParams>,
     operatorId: number
