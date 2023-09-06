@@ -47,7 +47,8 @@ const list = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const calculatorParamsList = await CalculatorParams.findAll({
       where: { userId },
-      attributes: { exclude }
+      attributes: { exclude },
+      order: [['name', 'ASC']]
     });
 
     res.status(200).json({
