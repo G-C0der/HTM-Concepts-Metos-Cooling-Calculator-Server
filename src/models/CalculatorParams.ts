@@ -34,6 +34,7 @@ class CalculatorParams extends Model {
   // timestamps
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
+  public readonly deletedAt!: Date;
 }
 
 CalculatorParams.init({
@@ -136,12 +137,17 @@ CalculatorParams.init({
   {
   sequelize,
   tableName: 'calculator_params',
+  paranoid: true,
   indexes: [
-    {
-      fields: ['userId', 'name'],
-      unique: true
-    },
-    // TODO: Only works with PostgreSQL
+    // TODO: Conditional index does not work with MySQL
+    // {
+    //   fields: ['userId', 'name'],
+    //   where: {
+    //     deletedAt: null
+    //   },
+    //   unique: true
+    // },
+    // TODO: Conditional index does not work with MySQL
     // {
     //   fields: ['userId', 'inUse'],
     //   where: {

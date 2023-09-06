@@ -62,6 +62,7 @@ class CalculatorParamsService {
     const { dataValues: { ...oldData } } = params;
 
     // Delete params
+    await params.update({ inUse: false });
     await params.destroy();
 
     // Log deletion
