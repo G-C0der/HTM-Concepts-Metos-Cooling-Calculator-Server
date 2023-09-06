@@ -71,11 +71,14 @@ class CalculatorParamsService {
     const { userId } = params;
 
     // Clear params in use
-    await CalculatorParams.update({ inUse: false }, { where: { userId } });
+    await this.clearInUse(userId);
 
     // Set in use
     await params?.update({ inUse: true });
   };
+
+  clearInUse = async (userId: number) =>
+    await CalculatorParams.update({ inUse: false }, { where: { userId } });
 }
 
 export default new CalculatorParamsService();
