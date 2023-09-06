@@ -124,7 +124,7 @@ CalculatorParams.init({
         };
 
         // Check if kettles is an actual array
-        if (!Array.isArray(kettles)) return false;
+        if (!Array.isArray(kettles)) throw new Error('Invalid kettle list.');
 
         // Check if all kettles valid
         for (const kettle of kettles) {
