@@ -2,6 +2,7 @@ import {CalculatorParams} from "../models";
 import {ParamsSaveAction, ParamsDeleteAction} from "./AuditLogService";
 import {auditLogService} from "./index";
 import {getChangedProperties} from "../utils";
+import {Op} from "sequelize";
 
 class CalculatorParamsService {
   create = async (
@@ -14,7 +15,7 @@ class CalculatorParamsService {
     const { dataValues: newData } = newParams;
 
     // Set params in use
-    await this.setInUse(newParams);
+    await this.setInUse(newParams.name, newParams.userId);
 
     // Log creation
     await auditLogService.log(createActionType, operatorId, operatorId, {}, newData, newData.id);
@@ -36,7 +37,7 @@ class CalculatorParamsService {
     const updatedParams = await params.save();
 
     // Set params in use
-    await this.setInUse(updatedParams);
+    await this.setInUse(updatedParams.name, updatedParams.userId);
 
     // Prepare loggable before and after data
     const { dataValues: newData } = updatedParams;
@@ -67,14 +68,12 @@ class CalculatorParamsService {
     await auditLogService.log(deleteActionType, operatorId, operatorId, oldData, {}, oldData.id);
   };
 
-  private setInUse = async (params: CalculatorParams) => {
-    const { userId } = params;
-
+  private setInUse = async (name: string, userId: number) => {
     // Clear params in use
     await this.clearInUse(userId);
 
     // Set in use
-    await params?.update({ inUse: true });
+    await CalculatorParams.update({ inUse: true }, { where: { name, userId } });
   };
 
   clearInUse = async (userId: number) =>
