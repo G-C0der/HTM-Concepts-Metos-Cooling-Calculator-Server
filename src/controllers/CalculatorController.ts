@@ -39,10 +39,10 @@ const save = async (req: Request, res: Response, next: NextFunction) => {
 
 const list = async (req: Request, res: Response, next: NextFunction) => {
   const userId = req.user!.id;
-  const { query: { initialLoad } } = req;
+  const { query: { resetParams } } = req;
   const exclude = ['userId'];
-  if (initialLoad === 'true') await calculatorParamsService.clearInUse(userId); // Clear inUse on initial load
-  else if (!initialLoad) exclude.push('inUse'); // If initial load not specified, don't include inUse in the payload
+  if (resetParams === 'true') await calculatorParamsService.clearInUse(userId); // Clear inUse
+  else if (!resetParams) exclude.push('inUse'); // If reset params not specified, don't include inUse in the payload
 
   try {
     const calculatorParamsList = await CalculatorParams.findAll({
