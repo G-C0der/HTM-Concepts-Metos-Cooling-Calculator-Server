@@ -27,6 +27,14 @@ class CalculatorParamsService {
     updateData: Partial<CalculatorParams>,
     operatorId: number
   )=> {
+    // Check if name already exists on other record for same user
+    const paramsWithSameName = await CalculatorParams.findOne({ where: {
+      userId: params.userId,
+      id: { [Op.ne]: params.id },
+      name: updateData.name
+    } });
+    if (paramsWithSameName) throw new Error('Params with same name already exist for the specified user.');
+
     // Set old data to buffer
     const { dataValues: { ...oldData } } = params;
 
