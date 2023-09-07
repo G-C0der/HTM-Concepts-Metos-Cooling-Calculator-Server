@@ -17,14 +17,16 @@ const save = async (req: Request, res: Response, next: NextFunction) => {
       } });
 
     if (existingParams) {
-      await calculatorParamsService.update(
+      const updatedParams = await calculatorParamsService.update(
         'save',
         existingParams,
         toEditableCalculatorParamsFields(req.body),
         userId
       );
 
-      return res.status(200).send('Calculator params update succeeded.');
+      return res.status(200).json({
+        calculatorParams: updatedParams
+      });
     } else {
       await calculatorParamsService.create('save', { ...req.body, userId }, userId);
 

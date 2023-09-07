@@ -57,6 +57,8 @@ class CalculatorParamsService {
     if (wasParamsUpdated) await auditLogService.log(
       updateActionType, operatorId, operatorId, loggableOldData, loggableNewData, newData.id
     );
+
+    return updatedParams;
   };
 
   delete = async (
