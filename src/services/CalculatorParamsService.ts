@@ -33,7 +33,7 @@ class CalculatorParamsService {
       id: { [Op.ne]: params.id },
       name: updateData.name
     } });
-    if (paramsWithSameName) throw new Error('Params with same name already exist for the specified user.');
+    if (paramsWithSameName) return false;
 
     // Set old data to buffer
     const { dataValues: { ...oldData } } = params;

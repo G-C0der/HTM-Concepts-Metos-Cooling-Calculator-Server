@@ -23,6 +23,10 @@ const save = async (req: Request, res: Response, next: NextFunction) => {
         toEditableCalculatorParamsFields(req.body),
         userId
       );
+      if (updatedParams === false) return res.status(400).json({
+        message: 'Params with same name already exist for this user account.',
+        severity: 'error'
+      });
 
       return res.status(200).json({
         calculatorParams: updatedParams
