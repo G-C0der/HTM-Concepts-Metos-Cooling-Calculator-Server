@@ -20,7 +20,8 @@ const list = async (req: Request, res: Response, next: NextFunction) => {
         {
           model: CalculatorParams,
           as: 'params',
-          attributes: ['name']
+          attributes: ['name'],
+          paranoid: false
         }
       ],
       order: [['createdAt', 'DESC']]
