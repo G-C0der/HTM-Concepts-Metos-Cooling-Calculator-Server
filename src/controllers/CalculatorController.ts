@@ -9,6 +9,8 @@ const save = async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.user!.id;
     const { name, id } = req.body;
 
+    if (!name.trim()) return res.status(400).send('Name invalid.');
+
     const existingParams = id
       ? await CalculatorParams.findByPk(id)
       : await CalculatorParams.findOne({ where: {
