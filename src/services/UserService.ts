@@ -3,7 +3,7 @@ import {clientBaseUrl} from "../config";
 import {User} from "../models";
 import _path from 'path';
 import {ServerError, VerificationError} from "../errors";
-import {Action, auditLogService, CreateAction, UpdateAction} from "./";
+import {UserAction, auditLogService, UserCreateAction, UserUpdateAction} from "./";
 import {getChangedProperties} from "../utils";
 import {urlExpiredError, urlInvalidError, urlNoUserAssociatedError} from "../constants";
 
@@ -22,7 +22,7 @@ class UserService {
   verifyToken = async (
     token: string,
     secret?: string,
-    invalidationAction?: Action,
+    invalidationAction?: UserAction,
     userAttributes: string[] = ['id']
   ): Promise<User> => {
     // Verify token
@@ -59,7 +59,7 @@ class UserService {
   };
 
   create = async (
-    createActionType: CreateAction,
+    createActionType: UserCreateAction,
     createData: Partial<User>,
     operatorId?: number
   ) => {
@@ -73,14 +73,13 @@ class UserService {
   };
 
   update = async (
-    updateActionType: UpdateAction,
+    updateActionType: UserUpdateAction,
     updateData: Partial<User>,
     userId: number,
     operatorId?: number
   ) => {
     // Query old data
-    const query = { where: { id: userId } };
-    const user = await User.findOne(query);
+    const user = await User.findByPk(userId);
     if (!user) return false;
     const { dataValues: { password, ...oldData } } = user;
 

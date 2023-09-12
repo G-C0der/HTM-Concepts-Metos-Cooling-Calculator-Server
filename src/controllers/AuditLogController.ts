@@ -1,6 +1,6 @@
 import {NextFunction, Request, Response} from "express";
 import {serverError} from "../constants";
-import {AuditLog, User} from "../models";
+import {AuditLog, CalculatorParams, User} from "../models";
 
 const list = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -16,6 +16,12 @@ const list = async (req: Request, res: Response, next: NextFunction) => {
           model: User,
           as: 'user',
           attributes: ['email']
+        },
+        {
+          model: CalculatorParams,
+          as: 'params',
+          attributes: ['name'],
+          paranoid: false
         }
       ],
       order: [['createdAt', 'DESC']]
