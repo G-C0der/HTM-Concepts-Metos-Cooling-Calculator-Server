@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import {serverError} from "../constants";
-import {CalculatorParams} from "../models";
+import {CalculatorParams, User} from "../models";
 import {toEditableCalculatorParamsFields} from "../utils";
 import {calculatorParamsService} from "../services";
 
@@ -46,13 +46,13 @@ const save = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 const list = async (req: Request, res: Response, next: NextFunction) => {
-  const userId = req.user!.id;
-  const { query: { resetParams } } = req;
-  const exclude = ['userId'];
-  if (resetParams === 'true') await calculatorParamsService.clearInUse(userId); // Clear inUse
-  else if (!resetParams) exclude.push('inUse'); // If reset params not specified, don't include inUse in the payload
-
   try {
+    const userId = req.user!.id;
+    const { query: { resetParams } } = req;
+    const exclude = ['userId'];
+    if (resetParams === 'true') await calculatorParamsService.clearInUse(userId); // Clear inUse
+    else if (!resetParams) exclude.push('inUse'); // If reset params not specified, don't include inUse in the payload
+
     const calculatorParamsList = await CalculatorParams.findAll({
       where: { userId },
       attributes: { exclude },
@@ -105,9 +105,37 @@ const remove = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
+const listAll = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const allCalculatorParamsList = await CalculatorParams.findAll({
+      attributes: { exclude: ['inUse'] },
+      include: [{
+        model: User,
+        as: 'user',
+        attributes: ['company', 'fname', 'lname']
+      }],
+      order: [
+        ['user', 'company', 'ASC'],
+        ['user', 'fname', 'ASC'],
+        ['user', 'lname', 'ASC'],
+        ['name', 'ASC']
+      ]
+    });
+
+    res.status(200).json({
+      allCalculatorParamsList
+    });
+  } catch (err) {
+    console.error(`${serverError} Error: ${err}`);
+    res.status(500).send(serverError);
+    next(err);
+  }
+}
+
 export {
   save,
   list,
   fetch,
-  remove
+  remove,
+  listAll
 };

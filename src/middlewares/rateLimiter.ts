@@ -27,6 +27,7 @@ const endpointLimits = [
   { endpoint: 'GET:/users', max: 10, keyword: 'user list' },
   { endpoint: 'PATCH:/users/:id/state-change', max: 3, keyword: 'active state change' },
   { endpoint: 'GET:/audit-log', max: 10, keyword: 'audit log' },
+  { endpoint: 'GET:/calculations/all', max: 10, keyword: 'parameters saves' },
 ];
 
 let redisClient: any, endpointRateLimiters: any;
