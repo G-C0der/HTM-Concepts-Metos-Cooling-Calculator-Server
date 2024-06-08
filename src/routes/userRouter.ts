@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import {
-  changeActiveState, editProfile, fetchForm,
+  changeActiveState, changeMode, editProfile, fetchForm,
   list,
   register, resetPassword,
   sendResetPasswordEmail,
@@ -27,6 +27,7 @@ userRouter.get('/users/form', authenticate, fetchForm);
 userRouter.patch('/users', rateLimiter, authenticate, editProfile);
 userRouter.patch('/users/:id', rateLimiter, authenticate, authorize, editProfile);
 userRouter.get('/users', rateLimiter, authenticate, authorize, list);
+userRouter.patch('/users/:id/mode-change', rateLimiter, authenticate, authorize, changeMode);
 userRouter.patch('/users/:id/state-change', rateLimiter, authenticate, authorize, changeActiveState);
 
 export default userRouter;

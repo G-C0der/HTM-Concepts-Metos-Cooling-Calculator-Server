@@ -319,6 +319,33 @@ const list = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
+const changeMode = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { params: { id }, user: admin, body: { mode } } = req;
+
+    // Get user
+    const user = await User.findByPk(id);
+    if (!user) return res.status(400).send('User doesn\'t exist.');
+
+    // Change user mode
+    const wasModeChanged = userService.update(
+      'modeChange',
+      { mode },
+      +id,
+      admin!.id
+    );
+    if (!wasModeChanged) {
+      return res.status(500).send('Unexpected error during user mode change. Please try again later.');
+    }
+
+    res.status(200).json('Mode change succeeded.');
+  } catch (err) {
+    console.error(`${serverError} Error: ${err}`);
+    res.status(500).send(serverError);
+    next(err);
+  }
+};
+
 const changeActiveState = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { params: { id }, user: admin, body: { active } } = req;
@@ -362,5 +389,6 @@ export {
   fetchForm,
   editProfile,
   list,
-  changeActiveState
+  changeMode,
+  changeActiveState,
 };
