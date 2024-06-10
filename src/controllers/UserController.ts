@@ -13,6 +13,7 @@ import {
 } from "../constants";
 import {VerificationError} from "../errors";
 import {toEditableUserFields} from "../utils";
+import { ValidationError } from 'sequelize';
 
 const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -319,6 +320,40 @@ const list = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
+const changeMode = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { params: { id }, user: admin, body: { mode } } = req;
+
+    // Get user
+    const user = await User.findByPk(id);
+    if (!user) return res.status(400).send('User doesn\'t exist.');
+
+    // Change user mode
+    let wasModeChanged;
+    try {
+      wasModeChanged = await userService.update(
+        'modeChange',
+        { mode },
+        +id,
+        admin!.id
+      );
+    } catch (err) {
+      if (err instanceof ValidationError) {
+        return res.status(400).send('Invalid mode.');
+      }
+    }
+    if (!wasModeChanged) {
+      return res.status(500).send('Unexpected error during user mode change. Please try again later.');
+    }
+
+    res.status(200).json('Mode change succeeded.');
+  } catch (err) {
+    console.error(`${serverError} Error: ${err}`);
+    res.status(500).send(serverError);
+    next(err);
+  }
+};
+
 const changeActiveState = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { params: { id }, user: admin, body: { active } } = req;
@@ -328,7 +363,7 @@ const changeActiveState = async (req: Request, res: Response, next: NextFunction
     if (!user) return res.status(400).send('User doesn\'t exist.');
 
     // Change user active state
-    const wasActiveStateChanged = userService.update(
+    const wasActiveStateChanged = await userService.update(
       active ? 'activation' : 'deactivation',
       { active },
       +id,
@@ -362,5 +397,6 @@ export {
   fetchForm,
   editProfile,
   list,
-  changeActiveState
+  changeMode,
+  changeActiveState,
 };

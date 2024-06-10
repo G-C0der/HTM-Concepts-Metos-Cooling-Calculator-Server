@@ -1,11 +1,13 @@
 import { DataTypes, Model } from 'sequelize';
 import {sequelize} from './';
 import {userFieldLengths} from "../constants";
+import {UserMode} from "../enums/UserMode";
 
 class User extends Model {
   public id!: number;
   public email!: string;
   public password!: string;
+  public mode!: string;
   public verified!: boolean;
   public active!: boolean;
   public admin!: boolean;
@@ -42,6 +44,16 @@ User.init({
   password: {
     type: new DataTypes.STRING(128),
     allowNull: false
+  },
+  mode: {
+    type: new DataTypes.STRING(16),
+    allowNull: false,
+    defaultValue: UserMode.UserModeMetos,
+    validate: {
+      isModeValid(mode: any) {
+        if (!Object.values(UserMode).includes(mode)) throw new Error('Invalid mode.');
+      }
+    }
   },
   verified: {
     type: new DataTypes.BOOLEAN(),

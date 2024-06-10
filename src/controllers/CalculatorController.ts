@@ -3,6 +3,7 @@ import {serverError} from "../constants";
 import {CalculatorParams, User} from "../models";
 import {toEditableCalculatorParamsFields} from "../utils";
 import {calculatorParamsService} from "../services";
+import {ValidationError} from "sequelize";
 
 const save = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -18,25 +19,31 @@ const save = async (req: Request, res: Response, next: NextFunction) => {
         name
       } });
 
-    if (existingParams) {
-      const updatedParams = await calculatorParamsService.update(
-        'save',
-        existingParams,
-        toEditableCalculatorParamsFields(req.body),
-        userId
-      );
-      if (updatedParams === false) return res.status(400).json({
-        message: 'Parameters with same name already exist for this user account.',
-        severity: 'error'
-      });
+    try {
+      if (existingParams) {
+        const updatedParams = await calculatorParamsService.update(
+          'save',
+          existingParams,
+          toEditableCalculatorParamsFields(req.body),
+          userId
+        );
+        if (updatedParams === false) return res.status(400).json({
+          message: 'Parameters with same name already exist for this user account.',
+          severity: 'error'
+        });
 
-      return res.status(200).json({
-        calculatorParams: updatedParams
-      });
-    } else {
-      await calculatorParamsService.create('save', { ...req.body, userId }, userId);
+        return res.status(200).json({
+          calculatorParams: updatedParams
+        });
+      } else {
+        await calculatorParamsService.create('save', { ...req.body, userId }, userId);
 
-      return res.status(200).send('Calculator params save succeeded.');
+        return res.status(200).send('Calculator params save succeeded.');
+      }
+    } catch (err) {
+      if (err instanceof ValidationError) {
+        return res.status(400).send('Invalid kettles.');
+      }
     }
   } catch (err) {
     console.error(`${serverError} Error: ${err}`);

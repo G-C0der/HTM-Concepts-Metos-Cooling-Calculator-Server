@@ -24,7 +24,7 @@ const authenticate = async (req: Request, res: Response, next: NextFunction) => 
     // Validate user
     const user = await User.findOne({
       where: { id },
-      attributes: ['id', 'active', 'verified', 'admin', 'email', 'fname', 'lname']
+      attributes: ['id', 'mode', 'active', 'verified', 'admin', 'email', 'fname', 'lname']
     });
     if (!user || !user.verified || !user.active) return res.status(401).send(unauthorizedError);
 

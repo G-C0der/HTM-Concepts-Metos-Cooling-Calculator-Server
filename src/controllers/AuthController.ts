@@ -29,7 +29,7 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
     // Find user with email
     const user: User | null = await User.findOne({
       where: { email },
-      attributes: ['id', 'password', 'verified', 'active', 'admin', 'email', 'fname', 'lname']
+      attributes: ['id', 'password', 'mode', 'verified', 'active', 'admin', 'email', 'fname', 'lname']
     });
     if (!user) return res.status(400).send('Credentials are invalid.');
 

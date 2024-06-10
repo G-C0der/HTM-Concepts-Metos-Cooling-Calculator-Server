@@ -1,7 +1,7 @@
 import { DataTypes, Model } from 'sequelize';
 import {sequelize} from './';
 
-const SIZE_LITRES_VALUES = [40, 60, 80, 100, 150, 200, 300, 400] as const;
+const SIZE_LITRES_VALUES = [40, 60, 80, 100, 150, 200, 300, 400, 500] as const;
 const COOLING_MODE_VALUES = ['C2', 'C3', 'C5i'] as const;
 
 type SizeLitres = typeof SIZE_LITRES_VALUES[number];

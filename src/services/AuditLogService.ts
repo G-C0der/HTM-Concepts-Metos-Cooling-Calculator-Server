@@ -1,7 +1,7 @@
 import {AuditLog} from "../models";
 
 type UserCreateAction = 'registration';
-type UserUpdateAction = 'verification' | 'passwordReset' | 'profileEdit' | 'activation' | 'deactivation';
+type UserUpdateAction = 'verification' | 'passwordReset' | 'profileEdit' | 'modeChange' | 'activation' | 'deactivation';
 type ParamsSaveAction = 'save';
 type ParamsDeleteAction = 'delete';
 type UserAction = UserCreateAction | UserUpdateAction;
