@@ -26,7 +26,7 @@ const authenticate = async (req: Request, res: Response, next: NextFunction) => 
       where: { id },
       attributes: ['id', 'mode', 'active', 'verified', 'admin', 'email', 'fname', 'lname']
     });
-    if (!user || !user.verified || !user.active) return res.status(401).send(unauthorizedError);
+    if (!user || /*!user.verified ||*/ !user.active) return res.status(401).send(unauthorizedError);
 
     // Prepare user object for client and further usage
     const { dataValues: { verified, active, ...userData } } = user;

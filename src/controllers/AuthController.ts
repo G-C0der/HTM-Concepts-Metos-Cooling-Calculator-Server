@@ -38,10 +38,10 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
     if (!isPasswordValid) return res.status(400).send('Credentials are invalid.');
 
     // Verify user
-    if (!user.verified) return res.status(400).json({
+    /*if (!user.verified) return res.status(400).json({
       message: 'Your user account hasn\'t been verified yet.',
       severity: 'warning'
-    });
+    });*/
     if (!user.active) return res.status(400).json({
       message: 'Your user account is currently inactive.',
       severity: 'warning'
