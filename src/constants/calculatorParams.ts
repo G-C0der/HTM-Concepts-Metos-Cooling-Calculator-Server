@@ -7,6 +7,7 @@ const editableCalculatorParamsFields = [
   'iceWaterCoolingType1Count',
   'iceWaterCoolingType4Count',
   'cop',
+  'kettlePowerRegenPercents',
   'kettles'
 ];
 
